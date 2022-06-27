@@ -1,0 +1,12 @@
+<mat-toolbar class="toolbar">
+  <button class="btn-menu" mat-icon-button aria-label="Example icon-button with menu icon"
+    (click)="navListFlag = !navListFlag">
+    <mat-icon>menu</mat-icon>
+  </button>
+  
+  <mat-nav-list class="nav-list" [ngClass]="{'dropdown-hidden': !navListFlag}" >
+    <a mat-button routerLink="/customers" routerLinkActive="active">Customers</a>
+    <a mat-button routerLink="/products" routerLinkActive="active">Products</a>
+    <a mat-button routerLink="/orders" routerLinkActive="active">Orders</a>
+  </mat-nav-list>
+</mat-toolbar>

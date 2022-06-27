@@ -1,0 +1,40 @@
+table {
+  width: 100%;
+}
+
+.btn-action {
+  color: #3f51b552;
+}
+
+.add {
+  padding-left: 7%;
+}
+
+.paginator {
+  padding-right: 30%;
+}
+
+.content {
+  padding-inline: 6%;
+  padding-top: 4%;
+}
+
+.error-message {
+  color: red;
+}
+
+.Cell {
+  width: 30%;
+}
+
+.table {
+  width: 50%;
+  padding-left: 20%;
+}
+
+.title {
+  margin-bottom: 10px;
+  font-size: 24px;
+  font-weight: 300;
+  text-align: center;
+}

@@ -1,0 +1,69 @@
+<div class="content table">
+  <mat-card class="title">Customers table</mat-card>
+<mat-error *ngIf="TableErrorMessage">{{TableErrorMessage}}</mat-error>
+  <div class="mat-elevation-z8" >
+    
+    <table mat-table [dataSource]="dataSource" matSort>
+      <ng-container matColumnDef="firstName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> First Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.firstName}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="lastName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Last Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.lastName}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Customer type </th>
+        <td mat-cell *matCellDef="let element"> 
+          {{getTypeValue(element.type)}}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef matSortDisabled>
+          <button matTooltip="Create new customer" (click)="openCreateCustomerDialog()" mat-icon-button
+            class="btn-action add" aria-label="Example icon button with a Delete icon">
+            <mat-icon>add</mat-icon>
+          </button>
+        </th>
+
+        <td mat-cell *matCellDef="let element" class="Cell">
+          <button matTooltip="Customers details" (click)="openInfoDialog(element.id)" mat-icon-button class="btn-action"
+            aria-label="Example icon button with a Delete icon">
+            <mat-icon>info</mat-icon>
+          </button>
+
+          <button matTooltip="Edit customer" (click)="openEditCustomerDialog(element.id)" mat-icon-button
+            class="btn-action" aria-label="Example icon button with a Delete icon">
+            <mat-icon>edittwotone</mat-icon>
+          </button>
+
+          <button matTooltip="Delete customer" (click)="openDeleteCustomerDialog(element.id)" mat-icon-button
+            class="btn-action" aria-label="Example icon button with a Delete icon">
+            <mat-icon>deletetwotone</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+    <mat-paginator class="paginator" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons
+      aria-label="Select page of periodic elements">
+    </mat-paginator>
+  </div>
+
+  <!-- Customer delete dialog -->
+  <ng-template #deleteCustomerDialog>
+    <div>
+      <h1>Are you sure you want to delete?</h1>
+    </div>
+    <button mat-button cdkFocusInitial (click)="DeleteDialogCancelClick()">Cancel</button>
+    <button mat-button (click)="DeleteDialogDeleteClick()">Delete</button>
+    <div *ngIf="DeleteDialogErrorMessage" class="error-message">
+      {{DeleteDialogErrorMessage}}
+    </div>
+  </ng-template>
+</div>

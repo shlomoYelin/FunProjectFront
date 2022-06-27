@@ -1,0 +1,46 @@
+<h1 mat-dialog-title>Edit customer </h1>
+<div mat-dialog-content>
+    <form [formGroup]="EditForm">
+        <mat-grid-list cols="2" rowHeight="2:1">
+            <mat-grid-tile>
+                <mat-form-field appearance="fill">
+                    <mat-label>First Name</mat-label>
+                    <input type="text" matInput formControlName="FirstName">
+                    <mat-error *ngIf="EditForm.get('FirstName')?.invalid">
+                        FirstName is <strong>required</strong>
+                    </mat-error>
+                </mat-form-field>
+            </mat-grid-tile>
+
+            <mat-grid-tile>
+                <mat-form-field appearance="fill">
+                    <mat-label>Last Name</mat-label>
+                    <input type="text" matInput formControlName="LastName">
+                    <mat-error *ngIf="EditForm.get('LastName')?.invalid">
+                        LastName is <strong>required</strong>
+                    </mat-error>
+                </mat-form-field>
+            </mat-grid-tile>
+            <mat-grid-tile colspan="2">
+                <mat-form-field>
+                    <mat-label>Customer Type</mat-label>
+                    <mat-select formControlName="TypeControl">
+                        <mat-option *ngFor="let type of CustomerTypes " [value]="type">
+                            {{type}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="EditForm.get('TypeControl')?.invalid">
+                        Customer type is <strong>required</strong>
+                    </mat-error>
+                </mat-form-field>
+            </mat-grid-tile>
+        </mat-grid-list>
+        <div *ngIf="ServerErrorMessage" class="error-message">
+            {{ServerErrorMessage}}
+        </div>
+    </form>
+</div>
+<div mat-dialog-actions>
+    <button mat-button (click)="CancelClick()">Cancel</button>
+    <button mat-button cdkFocusInitial (click)="UpdateClick()">Update</button>
+</div>

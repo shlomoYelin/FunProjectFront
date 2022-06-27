@@ -1,0 +1,42 @@
+$breakpoint-mobile: 960px;
+
+@mixin mobile {
+    @media (max-width: $breakpoint-mobile) {
+        @content
+    }
+}
+
+a {
+    margin: 20%;
+
+    @include mobile {
+        margin: 5%;
+    }
+}
+
+.btn-menu {
+    display: none;
+
+    @include mobile {
+        display: block;
+    }
+}
+
+.dropdown-hidden {
+    display: block;
+
+    @include mobile {
+        display: none;
+    }
+}
+
+@include mobile {
+    .nav-list {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .toolbar {
+        display: table-cell;
+    }
+}
