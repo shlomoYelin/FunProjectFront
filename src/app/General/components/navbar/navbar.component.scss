@@ -1,8 +1,9 @@
+@use '../../styles/global-style.scss' as global;
 $breakpoint-mobile: 960px;
 
 @mixin mobile {
     @media (max-width: $breakpoint-mobile) {
-        @content
+        @content;
     }
 }
 
@@ -23,10 +24,19 @@ a {
 }
 
 .dropdown-hidden {
-    display: block;
+    @include mobile {
+        @include global.hide-element;
+        // display: none;
+        // position: absolute;
+        // left: -999px;
+    }
+}
+
+.toolbar {
+    vertical-align: middle;
 
     @include mobile {
-        display: none;
+        display: table-cell;
     }
 }
 
@@ -36,7 +46,32 @@ a {
         flex-direction: column;
     }
 
-    .toolbar {
-        display: table-cell;
+    .dropdown-hidden {
+        display: none;
+        position: absolute;
+        left: -999px;
     }
+}
+
+.out-of-stock-list {
+    position: absolute;
+    top: 123px;
+
+    // background-color: cadetblue;
+    .item {
+        margin-top: 5%;
+        color: red;
+    }
+}
+
+.out-of-stock-item-card {
+    width: 100%;
+
+    .message {
+        color: red;
+    }
+}
+
+.notifications-item {
+    color: black;
 }

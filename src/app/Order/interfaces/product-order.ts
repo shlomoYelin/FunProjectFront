@@ -5,4 +5,6 @@ export interface ProductOrder {
     orderId: number
     PoPrice: number
     productDescription?: string
+    errorMessage?: string
+    
 }

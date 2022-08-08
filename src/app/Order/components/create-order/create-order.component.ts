@@ -1,27 +1,29 @@
 import { formatDate } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
-import { debounceTime, distinctUntilChanged, finalize, map, Observable, of, startWith, switchMap, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, finalize, Observable, map, of } from 'rxjs';
 import { Customer } from 'src/app/Customer/interfaces/customer';
 import { CustomersService } from 'src/app/Customer/Services/customers.service';
-import { ActionStatus } from 'src/app/General/interfaces/action-status';
+import { ActionStatus } from 'src/app/General/Models/action-status';
 import { ProductOrder } from 'src/app/Order/interfaces/product-order';
 import { OrdersService } from 'src/app/Order/Services/orders.service';
 import { Product } from 'src/app/Product/interfaces/product';
 import { ProductsService } from 'src/app/Product/Services/products.service';
+import { autoCompleteValidat } from 'src/app/Validators/autocomplete-validator';
 import { isObject } from 'src/app/Validators/IsObjectValidator';
+import { notZero } from 'src/app/Validators/number-validator';
 
 
 @Component({
   selector: 'app-create-order',
   templateUrl: './create-order.component.html',
-  styleUrls: ['./create-order.component.css']
+  styleUrls: ['./create-order.component.scss']
 })
 export class CreateOrderComponent implements OnInit {
   Customers!: Customer[]
@@ -29,7 +31,9 @@ export class CreateOrderComponent implements OnInit {
   ProductOrderId = 0;
   minDate = new Date();
 
-  ProductAutoCompleteData!: Observable<Product[]>;
+  // ProductAutoCompleteData!: Observable<Product[]>;
+  ProductAutoCompleteData: Product[] = [];
+
 
   Cart!: MatTableDataSource<ProductOrder>;
   displayedColumns: string[] = ['productDescription', 'quantity', 'PoPrice', 'actions'];
@@ -37,13 +41,15 @@ export class CreateOrderComponent implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
 
-  @ViewChild(MatAutocompleteTrigger) autoComplete!: MatAutocompleteTrigger;
+  // @ViewChild(MatAutocompleteTrigger) autoComplete!: MatAutocompleteTrigger;
 
 
   ProductForm: FormGroup = new FormGroup({
-    QuantityControl: new FormControl(null, Validators.required),
-    ProductSelectControl: new FormControl(null, { validators: [Validators.required, isObject] }),
+    QuantityControl: new FormControl(null, Validators.compose([Validators.required, notZero])),
+    ProductNameControl: new FormControl(null, { validators: [Validators.required, autoCompleteValidat(this.ProductAutoCompleteData)] }),
+    // ProductSelectControl: new FormControl(null, { validators: [Validators.required, isObject] }),
   });
+  // formBuilder: FormBuilder = new FormBuilder();
 
   OrderForm: FormGroup = new FormGroup({
     CustomerControl: new FormControl('', Validators.required),
@@ -58,43 +64,27 @@ export class CreateOrderComponent implements OnInit {
 
   OrderFormErrorMessage!: string
   ProductFormErrorMessage!: string
-  ProductExistsError!: boolean
   isLoading = false;
 
+  tmpflag = false;
 
   constructor(
     private _productsService: ProductsService,
     private _customerService: CustomersService,
     private _orderService: OrdersService,
     private _snackBar: MatSnackBar,
-    private _router: Router) {
-  }
+    private _router: Router) { }
 
   ngOnInit(): void {
+    this.setDefaultsValues();
     this.getCustomers();
     this.getProducts();
     this.subscribeToQuantityControlChanges();
     this.generateItemsTable([]);
   }
 
-  autoCompleteOpened() {
-    this.autoCompleteInputChanged();
-  }
-
-  autoCompleteOptionSelected() {
-    this.autoComplete.closePanel();
-    this.SelectedProduct = this.Products[this.Products.findIndex(p => p.id == ((this.ProductForm.controls['ProductSelectControl'].value)?.id))];
-    this.ProductPrice = (this.SelectedProduct?.price) * (this.ProductForm.controls['QuantityControl'].value);
-  }
-
-  autoCompleteInputChanged() {
-    const value = this.ProductForm.get('ProductSelectControl')?.value;
-    if (value) {
-      this.autoComplete.openPanel();
-    }
-    else {
-      this.autoComplete.closePanel();
-    }
+  setDefaultsValues() {
+    this.OrderForm.get('DatePickerControl')?.setValue(new Date());
   }
 
   productNameDisplayFn(product: Product): string {
@@ -102,29 +92,75 @@ export class CreateOrderComponent implements OnInit {
   }
 
   generateAutoComplitData() {
-    this.ProductAutoCompleteData = this.ProductForm.controls['ProductSelectControl']?.valueChanges
+    this.ProductForm.controls['ProductNameControl']?.valueChanges
       .pipe(
         debounceTime(1000),
         distinctUntilChanged(),
-        tap(() => this.isLoading = true),
-        switchMap(val => this._productsService.getBySearchValue(val)
-          .pipe(finalize(() => this.isLoading = false),)
-        )
-        // startWith(''),
-        // map(val => this._filter(val || ''))
+      )
+      .subscribe(
+        {
+          next: val => {
+            console.log('Product Name Change', val);
+            this.isLoading = true;
+            this.removeProductNameValidators();
+            this.fillAutoComplete(val);
+          }
+        }
       );
   }
 
-  // _filter(value: string): Product[] {
-  //   if (typeof value === 'object') { return []; }
+  fillAutoComplete(val: string) {
+    this.getProductsBySearchValue(val)
+      .subscribe(
+        {
+          next: products => {
+            this.ProductAutoCompleteData = products;
+            this.addProductNameValidators();
+            if (this.ProductForm.controls['ProductNameControl'].valid) {
+              this.setSelectedProductByInputValue();
+            }
+          }
+        }
+      )
+  }
 
-  //   const filterValue = value.toLowerCase();
+  removeProductNameValidators() {
+    this.ProductForm.controls['ProductNameControl'].clearValidators()
+    this.ProductForm.controls['ProductNameControl'].updateValueAndValidity();
+  }
 
-  //   return this.Products.filter(product => product.description.toLowerCase().includes(filterValue));
-  // }
+  addProductNameValidators() {
+    this.ProductForm.controls['ProductNameControl'].addValidators([autoCompleteValidat(this.ProductAutoCompleteData), Validators.required])
+    this.ProductForm.controls['ProductNameControl'].updateValueAndValidity();
+  }
 
-  generateItemsTable(ProducstOrders: ProductOrder[]) {
-    this.Cart = new MatTableDataSource<ProductOrder>(ProducstOrders)
+  setSelectedProductByInputValue() {
+    const index = this.Products.findIndex(product => product.description == this.ProductForm.controls['ProductNameControl'].value);
+    if (index == -1) {
+      this.ProductFormErrorMessage = 'Product not-found';
+      this.ProductForm.reset();
+      return;
+    }
+    this.SelectedProduct = this.Products[index];
+  }
+
+  getProductsBySearchValue(val: string) {
+    return (
+      val ?
+        this._productsService.getBySearchValue(val).pipe(map(data => {
+          return data;
+        }))
+        : of([])
+    )
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+        })
+      );
+  }
+
+  generateItemsTable(productsOrders: ProductOrder[] = this.Cart.data) {
+    this.Cart = new MatTableDataSource<ProductOrder>(JSON.parse(JSON.stringify(productsOrders)))
     this.Cart.sort = this.sort;
     this.Cart.paginator = this.paginator;
   }
@@ -164,17 +200,27 @@ export class CreateOrderComponent implements OnInit {
       return;
     }
 
-    if (this.Cart.data.find(p => p.productId === this.SelectedProduct.id)) {
-      this.ProductExistsError = true
+    if (this.findProductOrderInCart(this.SelectedProduct.id)) {
+      this.ProductFormErrorMessage = 'Product already exists in this order';
       return;
     }
-    this.ProductExistsError = false;
 
-    this.addOrderItem2Cart()
-
-    this.TotalPrice += (this.SelectedProduct.price) * (parseInt(this.ProductForm.get('QuantityControl')?.value));
-    this.ProductForm.reset();
-    this.ProductPrice = 0;
+    this.selectedProductQuantityIsInStock()
+      .subscribe(
+        {
+          next: (res: number) => {
+            if (res >= parseInt(this.ProductForm.get('QuantityControl')?.value)) {
+              this.addOrderItem2Cart()
+              this.updateTotalPrice();
+              this.resetProductForm();
+            }
+            else {
+              this.ProductFormErrorMessage = res ? `There are only ${res} units in stock` : 'The product ran out of stock';
+            }
+          },
+          error: err => this.ProductFormErrorMessage = err
+        }
+      )
   }
 
   addOrderItem2Cart() {
@@ -183,9 +229,33 @@ export class CreateOrderComponent implements OnInit {
       orderId: 0,
       productId: this.SelectedProduct.id,
       productDescription: this.SelectedProduct.description,
-      PoPrice: (this.SelectedProduct.price) * (parseInt(this.ProductForm.get('QuantityControl')?.value))
+      PoPrice: this.getSelectedProductTotalPrice()
     });
     this.generateItemsTable(this.Cart.data);
+  }
+
+  getSelectedProductTotalPrice() {
+    return (this.SelectedProduct.price) * (parseInt(this.ProductForm.get('QuantityControl')?.value));
+  }
+
+  findProductOrderInCart(productId: number): ProductOrder | undefined {
+    return this.Cart.data.find(p => p.productId == this.SelectedProduct.id);
+  }
+
+  selectedProductQuantityIsInStock(): Observable<number> {
+    return this._productsService.IsInStock(this.SelectedProduct.id, (parseInt(this.ProductForm.get('QuantityControl')?.value)))
+  }
+
+  updateTotalPrice() {
+    this.TotalPrice = 0;
+    let productOrders = this.Cart.data;
+    productOrders.forEach(po => this.TotalPrice += po.PoPrice)
+  }
+
+  resetProductForm() {
+    this.ProductFormErrorMessage = '';
+    this.ProductForm.reset();
+    this.ProductPrice = 0;
   }
 
   DeleteOrderItemClick(productId: number) {
@@ -199,13 +269,85 @@ export class CreateOrderComponent implements OnInit {
     });
   }
 
-  QuantityChange(productId: number, NewQuantity: string) {
-    const itemIndex = this.Cart.data.findIndex(i => i.productId == productId);
-    const productPrice = this.Products.find(p => p.id == productId)?.price;
-    this.TotalPrice -= this.Cart.data[itemIndex].PoPrice;
+  QuantityChange(productId: number, newQuantity: string) {
+    const errorMessage = this.quantityIsZeroValidator(newQuantity);
+    if (errorMessage) {
+      this.updateCartItem(productId, 1, errorMessage);
+      return; //לא משנה ל 1 
+    }
 
-    this.TotalPrice += this.Cart.data[itemIndex].PoPrice = parseFloat(NewQuantity) * (productPrice ?? 0);
-    this.Cart.data[itemIndex].quantity = parseFloat(NewQuantity);
+    const quantity = parseInt(newQuantity);
+    this.validateProductOrderQuantityInput(productId, newQuantity)
+
+    this.clearProductOrderErrorMessage(productId);
+
+
+    this._productsService.IsInStock(productId, quantity)
+      .subscribe(
+        {
+          next: (res: number) => {
+            if (res >= quantity) {
+              this.updateCartItem(productId, quantity);
+            }
+            else {
+              this.updateCartItem(productId, 1, res ? `There are only ${res} units in stock` : 'The product ran out of stock')
+            }
+            this.updateTotalPrice();
+          }
+        }
+      )
+  }
+
+  validateProductOrderQuantityInput(productId: number, quantityStr: string) {
+    const quantity = parseFloat(quantityStr);
+    let errorMessage = '';
+
+    if (quantity == NaN) {
+      errorMessage = 'Quantity must be a number.';
+      this.setProductOrderErrorMessage(productId, errorMessage);
+      throw new Error("Quantity must be a number");
+    }
+
+    this.setProductOrderErrorMessage(productId, errorMessage);
+  }
+
+  clearProductOrderErrorMessage(productId: number) {
+    this.setProductOrderErrorMessage(productId, '');
+  }
+
+  quantityIsZeroValidator(quantityStr: string) {
+    if (quantityStr == '0') {
+      return 'Quantity cant be zero.';
+    }
+    return ''
+  }
+
+  setProductOrderErrorMessage(productId: number, errorMessage: string) {
+    this.Cart.data.some(productOrder => {
+      if (productOrder.productId == productId) {
+        productOrder.errorMessage = errorMessage;
+        return true;
+      }
+      return false;
+    })
+  }
+
+  updateCartItem(productId: number, newQuantity: number, errorMessage: string = '') {
+    const productPrice = this.Products.find(p => p.id == productId)?.price;
+    console.log('newQuantity: ', newQuantity);
+
+    this.Cart.data.some(productOrder => {
+      if (productOrder.productId == productId) {
+        productOrder.PoPrice = newQuantity * (productPrice ?? 0);
+        productOrder.quantity = newQuantity;
+        productOrder.errorMessage = errorMessage;
+        return true;
+      }
+      return false;
+    })
+    console.log('cart:', this.Cart.data);
+
+    this.generateItemsTable();
   }
 
   createOrderClick() {
@@ -217,7 +359,6 @@ export class CreateOrderComponent implements OnInit {
     this.createOrder(this.Cart.data);
 
     this.Cart.data = [];
-
   }
 
   createOrder(productOrders: ProductOrder[]) {

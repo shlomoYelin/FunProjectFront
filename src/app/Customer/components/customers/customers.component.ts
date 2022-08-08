@@ -5,7 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { of } from 'rxjs';
-import { ActionStatus } from 'src/app/General/interfaces/action-status';
+import { ActionStatus } from 'src/app/General/Models/action-status';
 import { CreateCustomerDialogComponent } from '../../Dialogs/create-customer-dialog/create-customer-dialog.component';
 import { CustomerInfoDialogComponent } from '../../Dialogs/customer-info-dialog/customer-info-dialog.component';
 import { EditCustomerDialogComponent } from '../../Dialogs/edit-customer-dialog/edit-customer-dialog.component';
@@ -16,7 +16,7 @@ import { CustomersService } from '../../Services/customers.service';
 @Component({
   selector: 'app-customers',
   templateUrl: './customers.component.html',
-  styleUrls: ['./customers.component.css']
+  styleUrls: ['./customers.component.scss']
 })
 export class CustomersComponent implements OnInit {
   displayedColumns: string[] = ['firstName', 'lastName', 'type', 'actions'];
@@ -81,8 +81,9 @@ export class CustomersComponent implements OnInit {
     this.dialog.open(EditCustomerDialogComponent, {
       width: '500px',
       data: this.ELEMENT_DATA.find(c => c.id == id)
-    }).afterClosed().
-      subscribe(
+    })
+      .afterClosed()
+      .subscribe(
         (updated: boolean) => {
           if (updated) {
             this.getCustomers()
@@ -104,6 +105,7 @@ export class CustomersComponent implements OnInit {
   }
 
   DeleteDialogDeleteClick() {
+    this.DeleteDialogErrorMessage = '';
     this.CustomersService.delete(this.selectedCustomerId).
       subscribe(
         {

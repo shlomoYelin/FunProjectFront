@@ -20,6 +20,9 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatBadgeModule } from '@angular/material/badge';
 
 
 
@@ -47,6 +50,9 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
     MatDatepickerModule,
     MatNativeDateModule,
     MatAutocompleteModule,
+    MatProgressSpinnerModule,
+    MatBadgeModule,
+    MatMenuModule,
   ],
   exports: [
     MatToolbarModule,
@@ -69,6 +75,9 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
     MatDatepickerModule,
     MatNativeDateModule,
     MatAutocompleteModule,
+    MatProgressSpinnerModule,
+    MatBadgeModule,
+    MatMenuModule,
   ]
 })
 export class AppMaterialModule { }

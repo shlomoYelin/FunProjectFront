@@ -1,48 +1,51 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
-import { debounceTime, distinctUntilChanged, EMPTY, finalize, map, Observable, startWith, switchMap, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, EMPTY, filter, finalize, map, Observable, of, switchMap, tap } from 'rxjs';
 import { Customer } from 'src/app/Customer/interfaces/customer';
 import { CustomersService } from 'src/app/Customer/Services/customers.service';
-import { ActionStatus } from 'src/app/General/interfaces/action-status';
+import { ActionStatus } from 'src/app/General/Models/action-status';
+import { DateWithoutTime } from 'src/app/General/Models/date-without-time';
 import { ProductOrder } from 'src/app/Order/interfaces/product-order';
 import { OrdersService } from 'src/app/Order/Services/orders.service';
 import { Product } from 'src/app/Product/interfaces/product';
 import { ProductsService } from 'src/app/Product/Services/products.service';
-import { isObject } from 'src/app/Validators/IsObjectValidator';
+import { autoCompleteValidat } from 'src/app/Validators/autocomplete-validator';
+import { notZero } from 'src/app/Validators/number-validator';
 import { Order } from '../../interfaces/order';
 
 
 @Component({
   selector: 'app-edit-order',
   templateUrl: './edit-order.component.html',
-  styleUrls: ['./edit-order.component.css']
+  styleUrls: ['./edit-order.component.scss']
 })
 export class EditOrderComponent implements OnInit {
   Customers!: Customer[];
   Products!: Product[];
-  ProductAutoCompleteData!: Observable<Product[]>;
+  ProductAutoCompleteData: Product[] = [];
   ProductOrderId = 0;
   minDate = new Date();
 
-
+  prevOrder!: Order;
   Cart!: MatTableDataSource<ProductOrder>;
   displayedColumns: string[] = ['productDescription', 'quantity', 'PoPrice', 'actions'];
 
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
 
-  @ViewChild(MatAutocompleteTrigger) autoComplete!: MatAutocompleteTrigger;
+  // @ViewChild(MatAutocompleteTrigger) autoCompleteTrigger!: MatAutocompleteTrigger;
 
+  // @ViewChild(MatAutocomplete) auto!: MatAutocomplete;
 
   ProductForm: FormGroup = new FormGroup({
-    QuantityControl: new FormControl(null, Validators.required),
-    ProductSelectControl: new FormControl(null, { validators: [Validators.required, isObject] }),
+    QuantityControl: new FormControl(null, { validators: [Validators.required, notZero]}),
+    ProductNameControl: new FormControl(null, { validators: [Validators.required, autoCompleteValidat(this.ProductAutoCompleteData)] }),
   });
 
   OrderForm: FormGroup = new FormGroup({
@@ -60,7 +63,9 @@ export class EditOrderComponent implements OnInit {
   ProductFormErrorMessage!: string
   ProductExistsError!: boolean
   isLoading = false;
+  // isProductNotFound = false;
 
+  tmpflag = false;
 
   constructor(
     private _productsService: ProductsService,
@@ -79,68 +84,107 @@ export class EditOrderComponent implements OnInit {
     this.generateOrderData();
   }
 
-  autoCompleteOpened() {
-    this.autoCompleteInputChanged();
-  }
-
-  autoCompleteOptionSelected() {
-    this.autoComplete.closePanel();
-    this.SelectedProduct = this.Products[this.Products.findIndex(p => p.id == ((this.ProductForm.controls['ProductSelectControl'].value)?.id))];
-    this.ProductPrice = (this.SelectedProduct?.price) * (this.ProductForm.controls['QuantityControl'].value);
-  }
-
-  autoCompleteInputChanged() {
-    const value = this.ProductForm.get('ProductSelectControl')?.value;
-    if (value) {
-      this.autoComplete.openPanel();
-    }
-    else {
-      this.autoComplete.closePanel();
-    }
-  }
+  datePickerFilter = (date: DateWithoutTime | null): boolean => { return true; }
 
   productNameDisplayFn(product: Product): string {
     return product?.description ?? '';
   }
 
-  // generateAutoComplitData() {
-  //   this.ProductAutoCompleteData = this.ProductForm.controls['ProductSelectControl']?.valueChanges.pipe(
-  //     startWith(''),
-  //     map(val => this._filter(val || ''))
-  //   );
-  // }
-
   generateAutoComplitData() {
-    this.ProductAutoCompleteData = this.ProductForm.controls['ProductSelectControl']?.valueChanges
+    this.ProductForm.controls['ProductNameControl']?.valueChanges
       .pipe(
+        distinctUntilChanged(),
+        tap(() => this.isLoading = true),
         debounceTime(1000),
         distinctUntilChanged(),
-        tap(() => {this.isLoading = true; this.ProductAutoCompleteData = EMPTY}),
-        switchMap(val => this._productsService.getBySearchValue(val)
-          .pipe(finalize(() => this.isLoading = false),)
-        )
-        // startWith(''),
-        // map(val => this._filter(val || ''))
+      )
+      .subscribe(
+        {
+          next: val => {
+            console.log('Product Name Change', val);
+            // this.isLoading = true;
+            // this.isProductNotFound = false;
+            this.removeProductNameValidators();
+            this.fillAutoComplete(val);
+          }
+        }
       );
   }
 
-  // _filter(value: string): Product[] {
-  //   if (typeof value === 'object') { return []; }
-  //   const filterValue = value?.toLowerCase();
+  fillAutoComplete(val: string) {
+    this.getProductsBySearchValue(val)
+      .subscribe(
+        {
+          next: products => {
+            this.ProductAutoCompleteData = products;
+            this.addProductNameValidators();
+            if (this.ProductForm.controls['ProductNameControl'].valid) {
+              this.setSelectedProductByInputValue();
+            }
+          }
+        }
+      )
+  }
 
-  //   return this.Products.filter(product => product.description.toLowerCase().includes(filterValue));
-  // }
+  removeProductNameValidators() {
+    this.ProductForm.controls['ProductNameControl'].clearValidators()
+    this.ProductForm.controls['ProductNameControl'].updateValueAndValidity();
+  }
+
+  addProductNameValidators() {
+    this.ProductForm.controls['ProductNameControl'].addValidators([autoCompleteValidat(this.ProductAutoCompleteData), Validators.required])
+    this.ProductForm.controls['ProductNameControl'].updateValueAndValidity();
+  }
+
+  setSelectedProductByInputValue() {
+    const index = this.Products.findIndex(product => product.description == this.ProductForm.controls['ProductNameControl'].value);
+    if (index == -1) {
+      this.ProductFormErrorMessage = 'Product not-found';
+      this.ProductForm.reset();
+      return;
+    }
+    this.SelectedProduct = this.Products[index];
+  }
+
+  getProductsBySearchValue(val: string) {
+    // let flag = false;
+
+    return (
+      val ?
+        this._productsService.getBySearchValue(val).pipe(map(data => {
+          // flag = data.length == 0;
+          return data;
+        }))
+        : of([])
+    ).pipe(finalize(() => {
+      this.isLoading = false;
+      // this.isProductNotFound = flag;
+    }));
+  }
 
   generateOrderData() {
     this.getOrder()
       .subscribe({
         next: (order: Order) => {
+          this.prevOrder = JSON.parse(JSON.stringify(order));
+          this.setDatePickerFilter();
           this.fillOrderData(order);
         },
         error: (err) => {
           this._router.navigateByUrl('/404');
         }
       })
+  }
+
+  setDatePickerFilter() {
+    console.log('setDatePickerFilter');
+
+    this.datePickerFilter = (date: Date | null): boolean => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      date?.setHours(0, 0, 0, 0);
+      return (date ?? today) >= today || date?.toLocaleDateString() == new Date(this.prevOrder?.date).toLocaleDateString();
+    };
   }
 
   fillOrderData(order: Order) {
@@ -172,8 +216,8 @@ export class EditOrderComponent implements OnInit {
     return orderId;
   }
 
-  generateItemsTable(ProducstOrders: ProductOrder[]) {
-    this.Cart = new MatTableDataSource<ProductOrder>(ProducstOrders)
+  generateItemsTable(productsOrders: ProductOrder[] = this.Cart.data) {
+    this.Cart = new MatTableDataSource<ProductOrder>(JSON.parse(JSON.stringify(productsOrders)));
     this.Cart.sort = this.sort;
     this.Cart.paginator = this.paginator;
   }
@@ -219,11 +263,21 @@ export class EditOrderComponent implements OnInit {
     }
     this.ProductExistsError = false;
 
-    this.addOrderItem2Cart()
-
-    this.TotalPrice += (this.SelectedProduct.price) * (parseInt(this.ProductForm.get('QuantityControl')?.value));
-    this.ProductForm.reset();
-    this.ProductPrice = 0;
+    this.selectedProductQuantityIsInStock()
+      .subscribe(
+        (res: number) => {
+          if (res >= parseInt(this.ProductForm.get('QuantityControl')?.value)) {
+            this.addOrderItem2Cart()
+            this.TotalPrice += (this.SelectedProduct.price) * (parseInt(this.ProductForm.get('QuantityControl')?.value));
+            this.ProductForm.reset();
+            this.ProductPrice = 0;
+            this.ProductFormErrorMessage = '';
+          }
+          else {
+            this.ProductFormErrorMessage = res ? `There are only ${res} units in stock` : 'The product ran out of stock';
+          }
+        }
+      )
   }
 
   addOrderItem2Cart() {
@@ -237,6 +291,10 @@ export class EditOrderComponent implements OnInit {
     this.generateItemsTable(this.Cart.data);
   }
 
+  selectedProductQuantityIsInStock(): Observable<number> {
+    return this._productsService.IsInStock(this.SelectedProduct.id, (parseInt(this.ProductForm.get('QuantityControl')?.value)))
+  }
+
   DeleteOrderItemClick(productId: number) {
     this.Cart.data.forEach((po, index) => {
       if (po.productId == productId) {
@@ -248,17 +306,104 @@ export class EditOrderComponent implements OnInit {
     });
   }
 
-  QuantityChange(productId: number, newQuantity: string) {
-    this.updateCartItem(productId, newQuantity);
-    this.updateTotalPrice();
+  cartItemQuantityChange(productId: number, quantity: string) {
+    const errorMessage = this.quantityIsZeroValidator( quantity);
+    if (errorMessage) {
+      this.updateCartItem(productId, '1', errorMessage);
+      return;
+    }
+
+    const prevQuantity = this.prevOrder?.productOrders.find(p => p.productId == productId)?.quantity ?? 0;
+
+    const difference = parseInt(quantity) - prevQuantity;
+
+    this.clearProductOrderErrorMessage(productId);
+
+    this.validateQuantityInput(productId, quantity);
+    if (difference == NaN) {
+      throw new Error("Quantity must be a number");
+    }
+
+    const newQuantity = difference > 0 ? difference : 0
+
+    this._productsService.IsInStock(productId, newQuantity)
+      .subscribe(
+        {
+          next: (res: number) => {
+            if (res >= difference) {
+              this.updateCartItem(productId, quantity);
+            }
+            else {
+              this.updateCartItem(productId, '1', res ? `There are only ${res} units in stock` : 'The product ran out of stock');
+            }
+            this.updateTotalPrice();
+          },
+          error: err => console.log(err)
+        }
+      )
   }
 
-  updateCartItem(productId: number, newQuantity: string) {
-    const itemIndex = this.Cart.data.findIndex(i => i.productId == productId);
+  parseQuantityValidator(productId: number, quantityStr: string) {
+    const quantity = parseFloat(quantityStr);
+    let errorMessage = '';
+
+    if (quantity == NaN) {
+      errorMessage = 'Quantity must be a number.';
+    }
+    return errorMessage;
+  }
+
+  quantityIsZeroValidator(quantityStr: string) {
+    if (quantityStr == '0') {
+      return 'Quantity cant be zero.';
+    }
+    return ''
+  }
+
+  validateQuantityInput(productId: number, quantityStr: string) {
+    let errorMessage = '';
+    errorMessage = this.quantityIsZeroValidator( quantityStr);
+    errorMessage = errorMessage ?? this.parseQuantityValidator(productId, quantityStr);
+
+    console.log('errorMessage: ', errorMessage);
+
+    if(errorMessage) this.setProductOrderErrorMessage(productId, errorMessage);
+  }
+
+  clearProductOrderErrorMessage(productId: number) {
+    this.Cart.data.some(productOrder => {
+      if (productOrder.productId == productId) {
+        productOrder.errorMessage = "";
+        return true;
+      }
+      return false;
+    })
+  }
+
+  setProductOrderErrorMessage(productId: number, errorMessage: string) {
+    this.Cart.data.some(productOrder => {
+      if (productOrder.productId == productId) {
+        productOrder.errorMessage = errorMessage;
+        return true;
+      }
+      return false;
+    })
+    throw new Error(errorMessage);
+  }
+
+  updateCartItem(productId: number, newQuantity: string, errorMessage: string = '') {
     const productPrice = this.Products.find(p => p.id == productId)?.price;
 
-    this.Cart.data[itemIndex].PoPrice = parseFloat(newQuantity) * (productPrice ?? 0);
-    this.Cart.data[itemIndex].quantity = parseFloat(newQuantity);
+    this.Cart.data.some(productOrder => {
+      if (productOrder.productId == productId) {
+        productOrder.PoPrice = parseFloat(newQuantity) * (productPrice ?? 0);
+        productOrder.quantity = parseFloat(newQuantity);
+        productOrder.errorMessage = errorMessage;
+        return true;
+      }
+      return false;
+    })
+    this.generateItemsTable();
   }
 
   updateTotalPrice() {
@@ -276,7 +421,6 @@ export class EditOrderComponent implements OnInit {
     this.updateOrder(this.Cart.data);
 
     this.Cart.data = [];
-
   }
 
   updateOrder(productOrders: ProductOrder[]) {
@@ -294,19 +438,16 @@ export class EditOrderComponent implements OnInit {
             return;
           }
 
-          this.openSnackBar('Order created successfully');
+          this.openSnackBar('Order updated successfully');
           this._router.navigateByUrl('/orders');
         },
         error: err => this.CreationStatus = { success: false, message: 'Somthing went wrong please try reloading your browser ' }
       }
     )
-
   }
 
-
-
-  openSnackBar(message: string) {
-    this._snackBar.open(message, 'ok', { duration: 2700, verticalPosition: 'top', horizontalPosition: 'center' });
+  openSnackBar(message: string, _duration: number = 2700) {
+    this._snackBar.open(message, 'ok', { duration: _duration, verticalPosition: 'top', horizontalPosition: 'center' });
   }
 
 }

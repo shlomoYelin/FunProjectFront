@@ -1,7 +1,10 @@
 <div class="content table">
   <mat-error *ngIf="TabelErrorMessage">{{TabelErrorMessage}}</mat-error>
 
-  <mat-card class="title">Orders table</mat-card>
+  <mat-card class="title">Orders table </mat-card>
+
+  <app-table-filters (filter)="getFilteredOrders($event)" (getCsv)="getCsv($event)">
+  </app-table-filters>
 
   <div class="mat-elevation-z8">
     <mat-progress-bar *ngIf="progressBarMode" mode="indeterminate"></mat-progress-bar>

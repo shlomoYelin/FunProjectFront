@@ -4,5 +4,5 @@ export interface Customer {
     id: number;
     firstName: string,
     lastName: string,
-    type:CustomerType,
+    type: CustomerType,
 }

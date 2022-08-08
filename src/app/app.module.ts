@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -21,6 +21,8 @@ import { EditOrderComponent } from './Order/components/edit-order/edit-order.com
 import { NotFoundComponent } from './General/components/not-found/not-found.component';
 import { EditProductDialogComponent } from './Product/Dialogs/edit-product-dialog/edit-product-dialog.component';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { TableFiltersComponent } from './Order/components/table-filters/table-filters.component';
+import { SignalrService } from './SignalR/signalr.service';
 
 
 @NgModule({
@@ -39,6 +41,7 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
     EditOrderComponent,
     NotFoundComponent,
     EditProductDialogComponent,
+    TableFiltersComponent,
   ],
   imports: [
     BrowserModule,
@@ -50,6 +53,13 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
   ],
   providers: [
     // { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }
+    // SignalrService,
+    // {
+    //   provide: APP_INITIALIZER,
+    //   useFactory: (signalrService: SignalrService) => () => signalrService.startConnection(),
+    //   deps: [SignalrService],
+    //   multi: true,
+    // }
   ],
   bootstrap: [AppComponent]
 })

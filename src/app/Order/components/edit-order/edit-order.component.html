@@ -2,63 +2,7 @@
     <!-- Order Details -->
     <mat-card-title class="card-title">Edit your order</mat-card-title>
 
-    <mat-card>
-        <mat-card-content>
-            <mat-error *ngIf="!(CreationStatus?.success)">
-                {{CreationStatus?.message}}
-            </mat-error>
-            <form [formGroup]="OrderForm">
 
-                <mat-form-field class="product-name">
-                    <mat-label>Customer Name</mat-label>
-                    <mat-select formControlName="CustomerControl">
-                        <mat-option *ngFor="let customer of Customers" [value]="customer.id">
-                            {{customer.firstName + ' ' + customer.lastName}}
-                        </mat-option>
-                    </mat-select>
-                    <mat-error *ngIf="OrderForm.get('CustomerControl')?.invalid">
-                        Customer is <strong>required</strong>
-                    </mat-error>
-                </mat-form-field>
-
-                <mat-form-field appearance="fill" class="date-picker">
-                    <mat-label>Choose a date</mat-label>
-                    <input formControlName="DatePickerControl" matInput [matDatepicker]="picker" [min]="minDate">
-                    <mat-hint>DD/MM/YYYY</mat-hint>
-                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                    <mat-datepicker #picker></mat-datepicker>
-
-                    <mat-error *ngIf="OrderForm.get('DatePickerControl')?.invalid">
-                      
-                        <span *ngIf="OrderForm.controls['DatePickerControl']?.hasError('matDatepickerParse') ||
-                         OrderForm.controls['DatePickerControl']?.hasError('dateVaidator')">
-                            Please enter a <strong>valid</strong> date
-                        </span>
-
-                        <span *ngIf="OrderForm.controls['DatePickerControl']?.hasError('matDatepickerMin')">
-                            Select a <strong>future</strong> date
-                        </span>
-
-                        <span *ngIf="OrderForm.controls['DatePickerControl']?.hasError('required') && 
-                            !OrderForm.get('DatePickerControl')?.getError('matDatepickerParse')">
-                            <strong>Date</strong> is required.
-                        </span>
-
-                    </mat-error>
-                </mat-form-field>
-                <label class="price"> Total Price:{{TotalPrice | number:'0.1'}}</label>
-
-                <span matTooltip="You need to add products first." [matTooltipDisabled]="(Cart.data.length > 0)">
-                    <button [disabled]="!(Cart.data.length > 0)" (click)="saveOrderClick()" class="btn-create-order"
-                        mat-button color="primary">
-                        Save Order
-                    </button>
-                </span>
-                <mat-error *ngIf="OrderFormErrorMessage">{{OrderFormErrorMessage}}</mat-error>
-
-            </form>
-        </mat-card-content>
-    </mat-card>
 
 
     <!-- Cart Details -->
@@ -69,14 +13,24 @@
             <span class="list-footer">
                 <form [formGroup]="ProductForm">
 
-                    <mat-form-field class="example-full-width" appearance="fill">
+                    <!-- <mat-form-field class="example-full-width" appearance="fill">
                         <mat-label>Product Name</mat-label>
                         <input type="text" placeholder="Pick one" aria-label="Number" matInput
                             formControlName="ProductSelectControl" [matAutocomplete]="auto">
                         <mat-autocomplete #auto="matAutocomplete" [displayWith]="productNameDisplayFn"
-                        (opened)="autoCompleteOpened()" (optionSelected)="autoCompleteOptionSelected()">
-                            <mat-option *ngFor="let product of ProductAutoCompleteData | async" [value]="product">
-                                {{product.description}}
+                            (opened)="autoCompleteOpened()" (optionSelected)="autoCompleteOptionSelected()">
+
+                            <ng-container *ngFor="let product of ProductAutoCompleteData">
+                                <mat-option *ngIf="!isLoading" [value]="product">
+                                    {{product.description}}
+                                </mat-option>
+                            </ng-container>
+
+                            <mat-option *ngIf="isLoading" disabled style="color: black!important;">
+                                Loading...
+                            </mat-option>
+                            <mat-option *ngIf="isProductNotFound" disabled style="color: red!important;">
+                                <small>Product not found.</small>
                             </mat-option>
                         </mat-autocomplete>
                         <mat-error *ngIf="ProductForm.get('ProductSelectControl')?.invalid">
@@ -89,19 +43,58 @@
                                 Product is <strong>required</strong>
                             </span>
                         </mat-error>
+                    </mat-form-field> -->
+
+                    <mat-form-field class="example-full-width">
+                        <mat-label>Product Name</mat-label>
+
+                        <mat-spinner class="loading-spinner" *ngIf="isLoading" [diameter]="20"></mat-spinner>
+
+                        <input type="text" placeholder="Pick one" aria-label="Number" matInput [matAutocomplete]="auto"
+                            formControlName="ProductNameControl">
+
+
+                        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+
+                            <mat-option *ngFor="let product of ProductAutoCompleteData" [value]="product.description">
+                                {{product.description}}
+                            </mat-option>
+
+                        </mat-autocomplete>
+
+                        <mat-error *ngIf="ProductForm.get('ProductNameControl')?.invalid">
+                            <span
+                                *ngIf="ProductForm.controls['ProductNameControl'].hasError('not-found') &&
+                                                    !(ProductForm.controls['ProductNameControl'].hasError('required'))">
+                                Please select a product from the <strong>list</strong>
+                            </span>
+
+                            <span *ngIf="ProductForm.controls['ProductNameControl'].hasError('required')">
+                                Product is <strong>required</strong>
+                            </span>
+
+                        </mat-error>
+                        <!-- <mat-hint class="product-not-found-hint" align="start" *ngIf="isProductNotFound">Product not found</mat-hint> -->
                     </mat-form-field>
 
-                    <mat-form-field appearance="fill" class="quantity">
+                    <mat-form-field class="quantity">
                         <mat-label>Quantity</mat-label>
                         <input formControlName="QuantityControl" type="number" matInput
                             oninput="this.value = Math.round(this.value);" min="1">
                         <!--set only integer value-->
                         <mat-error *ngIf="ProductForm.get('QuantityControl')?.invalid">
-                            Quantity is <strong>required</strong>
+                            <span *ngIf="ProductForm.get('QuantityControl')?.hasError('isZero')">
+                                Quantity can't be <strong>zero</strong>
+                            </span>
+                            <span *ngIf="ProductForm.get('QuantityControl')?.hasError('required')">
+                                Quantity is <strong>required</strong></span>
                         </mat-error>
                     </mat-form-field>
                     <div class="price-summary">
                         <label class="price">Price:{{ProductPrice}}</label>
+                        <!-- <label>isProductNotFound: {{isProductNotFound}}</label> -->
+                        <!-- <label>isLoading: {{isLoading}}</label> -->
+                        <!-- <button type="button" (click)="validateAutoComplete()">click</button> -->
                     </div>
 
                     <button type="button" class="btn btn-primary" matTooltip="Add to cart" (click)="add2cardClick()"
@@ -126,17 +119,17 @@
                 <ng-container matColumnDef="quantity">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header> Quantity</th>
                     <td mat-cell *matCellDef="let element">
-                        <mat-form-field appearance="fill" class="cart-item-quantity">
-                            <mat-label>Quantity</mat-label>
-                            <input #Quantity (change)="QuantityChange(element.productId,Quantity.value)" type="number"
-                                matInput oninput="this.value = Math.round(this.value);" value="{{element.quantity}}"
-                                min="1">
+                        <mat-form-field class="cart-item-quantity">
+                            <input #Quantity (input)="cartItemQuantityChange(element.productId,Quantity.value)"
+                                type="number" matInput oninput="this.value = Math.round(this.value);"
+                                value="{{element.quantity}}" min="1">
                             <!--set only integer value-->
                         </mat-form-field>
+                        <mat-error *ngIf="element.errorMessage">{{element.errorMessage}}</mat-error>
                     </td>
                 </ng-container>
 
-                <ng-container matColumnDef="PoPrice">
+                <ng-container matColumnDef="PoPrice" ng->
                     <th mat-header-cell *matHeaderCellDef mat-sort-header class="date-header">Price</th>
                     <td mat-cell *matCellDef="let element"> {{element.PoPrice}}</td>
                 </ng-container>
@@ -167,4 +160,62 @@
         </div>
 
     </div>
+    <mat-card>
+        <mat-card-content>
+            <mat-error *ngIf="!(CreationStatus?.success)">
+                {{CreationStatus?.message}}
+            </mat-error>
+            <form [formGroup]="OrderForm">
+
+                <mat-form-field class="product-name">
+                    <mat-label>Customer Name</mat-label>
+                    <mat-select formControlName="CustomerControl">
+                        <mat-option *ngFor="let customer of Customers" [value]="customer.id">
+                            {{customer.firstName + ' ' + customer.lastName}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="OrderForm.get('CustomerControl')?.invalid">
+                        Customer is <strong>required</strong>
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="date-picker">
+                    <mat-label>Choose a date</mat-label>
+                    <input formControlName="DatePickerControl" matInput [matDatepicker]="picker"
+                        [matDatepickerFilter]="datePickerFilter">
+                    <mat-hint>DD/MM/YYYY</mat-hint>
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+
+                    <mat-error *ngIf="OrderForm.get('DatePickerControl')?.invalid">
+
+                        <span *ngIf="OrderForm.controls['DatePickerControl']?.hasError('matDatepickerParse') ||
+                             OrderForm.controls['DatePickerControl']?.hasError('dateVaidator')">
+                            Please enter a <strong>valid</strong> date
+                        </span>
+
+                        <span *ngIf="OrderForm.controls['DatePickerControl']?.hasError('matDatepickerFilter')">
+                            Select a <strong>future</strong> date
+                        </span>
+
+                        <span *ngIf="OrderForm.controls['DatePickerControl']?.hasError('required') && 
+                                !OrderForm.get('DatePickerControl')?.getError('matDatepickerParse')">
+                            <strong>Date</strong> is required.
+                        </span>
+
+                    </mat-error>
+                </mat-form-field>
+                <label class="price"> Total Price:{{TotalPrice | number:'0.1'}}</label>
+
+                <span matTooltip="You need to add products first." [matTooltipDisabled]="(Cart.data.length > 0)">
+                    <button [disabled]="!(Cart.data.length > 0)" (click)="saveOrderClick()" class="btn-create-order"
+                        mat-raised-button color="primary">
+                        Save Order
+                    </button>
+                </span>
+                <mat-error *ngIf="OrderFormErrorMessage">{{OrderFormErrorMessage}}</mat-error>
+
+            </form>
+        </mat-card-content>
+    </mat-card>
 </div>

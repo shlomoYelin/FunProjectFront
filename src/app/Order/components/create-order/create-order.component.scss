@@ -1,0 +1,257 @@
+@use '../../../General/styles/global-style.scss' as global;
+
+$min-width: 600px;
+$medium-width: 990px;
+$large-width: 1550px;
+$x-large-width: 1580px;
+
+@mixin media-max-or-min($max: true, $width) {
+    @if $max {
+        @media (max-width:$width) {
+            @content;
+        }
+    }
+
+    @else {
+        @media (min-width: $width) {
+            @content;
+        }
+    }
+}
+
+@mixin large-screen ($max: true) {
+    @if $max {
+        @media (max-width: $large-width) {
+            @content;
+        }
+    }
+
+    @else {
+        @media (min-width: $large-width) {
+            @content;
+        }
+    }
+}
+
+@mixin medium-screen($max: true) {
+    @include media-max-or-min($max, $medium-width) {
+        @content;
+    }
+}
+
+@mixin min-screen ($max: true) {
+    @if $max {
+        @media (max-width: $min-width) {
+            @content;
+        }
+    }
+
+    @else {
+        @media (min-width: $min-width) {
+            @content;
+        }
+    }
+}
+
+@mixin max-screen {
+    @media (min-width: $x-large-width) {
+        @content;
+    }
+}
+
+@mixin childs-margin-top($margin: 20px) {
+    &>* {
+        margin-top: $margin;
+    }
+}
+
+@mixin flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+@include large-screen {
+    .order-form {
+        @include flex-column;
+    }
+
+    .btn-create-order {
+        margin-left: 10%;
+    }
+}
+
+.order-form {
+    .fields {
+        @include medium-screen {
+            @include flex-column;
+            @include childs-margin-top;
+        }
+
+        padding: 10%;
+    }
+
+    .price-and-create-btn {
+        @include min-screen {
+            @include flex-column;
+            @include childs-margin-top;
+        }
+    }
+
+    @media (min-width:$min-width) {
+        @include childs-margin-top;
+    }
+}
+
+.product-form {
+    .fields {
+        @include medium-screen {
+            @include flex-column;
+            @include childs-margin-top;
+        }
+    }
+
+    .price-and-add2cart-btn {
+        @include min-screen {
+            @include flex-column;
+            @include childs-margin-top;
+        }
+    }
+
+    @include large-screen {
+        @include flex-column;
+    }
+
+    @media (min-width:$min-width) {
+        @include childs-margin-top;
+    }
+}
+
+.price {
+    font-size: large;
+
+    @include max-screen {
+        // padding-left: 5%;
+    }
+
+    @include large-screen {
+        padding-left: 5%;
+    }
+}
+
+.btn-add2card-icon {
+    @include large-screen {
+        @include global.hide-element;
+    }
+
+    margin-left: 5%;
+    background-color: #b0b0b0;
+}
+
+.btn-add2card {
+    @include large-screen(false) {
+        @include global.hide-element;
+    }
+
+    margin-left: 5%;
+    background-color: #b0b0b0;
+}
+
+.btn-create-order {
+    width: 50%;
+    padding: 10px;
+    left: 20%;
+    margin-top: 30px;
+}
+
+.content {
+    padding-inline: 25%;
+    padding-top: 4%;
+}
+
+.card-title {}
+
+.product-name {
+    /* width: 30%; */
+    margin-left: 5%;
+}
+
+.quantity {
+    @include medium-screen(false) {
+        width: 20%;
+    }
+
+    // width: 20%;  
+    margin-inline: 5%;
+}
+
+.cart-list {
+    max-height: 400px;
+    overflow: auto;
+}
+
+.cart {
+    padding-block: 20px;
+    margin-top: 5%;
+}
+
+.cart-item {
+    margin-block: 20px;
+}
+
+
+
+.total {
+    margin-left: 20%;
+}
+
+.card-item-content {
+    width: 100%;
+}
+
+.btn-delete {
+    margin-left: 29%;
+}
+
+.list-footer {
+    /* margin-left: 10%; */
+}
+
+.price-summary {
+    display: inline-grid;
+    vertical-align: 70%;
+}
+
+.date-picker {
+    margin-left: 5%;
+}
+
+.cart-title {
+    padding-inline: 40%;
+}
+
+.btn-delete-iten {
+    color: #3f51b552;
+}
+
+.cart-table {
+    width: 100%;
+}
+
+.cart-item-quantity {
+    width: 40%;
+    margin-inline: 5%;
+}
+
+.table-wrapper {
+    // width: 50%;
+    // margin-left: 25%;
+    margin-block: 20px;
+}
+
+.productForm-wrapper {
+    margin-left: 18%;
+}
+
+.no-data {
+    text-align: center;
+}

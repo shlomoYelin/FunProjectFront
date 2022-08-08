@@ -1,8 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable, startWith, switchMap } from 'rxjs';
-import { ActionStatus } from 'src/app/General/interfaces/action-status';
+import { CustomerType } from 'src/app/Customer/Enums/customer-type';
+import { ActionStatus } from 'src/app/General/Models/action-status';
 import { Order } from '../interfaces/order';
+import { OrderFiltersValuesModel } from '../Models/order-filters-values-model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,33 +14,42 @@ export class OrdersService {
 
   constructor(private http: HttpClient) { }
 
-  getAll() {
-    return this.http.get<Order[]>(this.BaseUrl);
+  getById(id: number) {
+    return this.http.get<Order>(`${this.BaseUrl}/GetOrder/${id}`);
   }
 
-  getById(id: number) {
-    return this.http.get<Order>(`${this.BaseUrl}/${id}`)
+  getByFilter(orderFilters: OrderFiltersValuesModel) {
+    return this.http.post<Order[]>(`${this.BaseUrl}/GetOrdersByFilters`, orderFilters);
+  }
+
+  getExcelReportByFilter(orderFilters: OrderFiltersValuesModel) {
+    return this.http.post(`${this.BaseUrl}/ExportToExcel`, orderFilters,
+      {
+        // headers: { 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9' },
+        responseType: 'blob',
+        observe: 'response'
+      });
   }
 
   create(order: Order) {
-    return this.http.post<ActionStatus>(this.BaseUrl, order);
+    return this.http.post<ActionStatus>(`${this.BaseUrl}/CreateOrder`, order);
   }
 
   update(order: Order) {
-    return this.http.put<ActionStatus>(this.BaseUrl, order)
+    return this.http.put<ActionStatus>(`${this.BaseUrl}/UpdateOrder`, order)
   }
 
   delete(id: number) {
-    return this.http.delete<ActionStatus>(`${this.BaseUrl}/${id}`);
+    return this.http.delete<ActionStatus>(`${this.BaseUrl}/DeleteOrder/${id}`);
   }
 
-  getAllWithFullName(): Observable<Order[]> {
-    return this.getAll()
+  getByFiltersWithFullName(orderFilters: OrderFiltersValuesModel): Observable<Order[]> {
+    return this.getByFilter(orderFilters)
       .pipe(
         map((data) => {
           data.forEach(o => o.customerFullName = o.firstName + ' ' + o.lastName);
           return data;
-        })
+        }),
       )
   }
 

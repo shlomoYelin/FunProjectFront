@@ -3,6 +3,7 @@
   <mat-error *ngIf="TabelErrorMessage">{{TabelErrorMessage}}</mat-error>
     <div class="mat-elevation-z8" >
       <mat-progress-bar *ngIf="progressBarMode" mode="indeterminate"></mat-progress-bar>
+      <div style="width: 100%;overflow-x: auto;">
       <table mat-table [dataSource]="dataSource" matSort>
         
         <ng-container matColumnDef="description">
@@ -13,6 +14,11 @@
         <ng-container matColumnDef="price">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Price </th>
           <td mat-cell *matCellDef="let element"> {{element.price}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="quantity">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Quantity </th>
+          <td mat-cell *matCellDef="let element"> {{element.quantity}} </td>
         </ng-container>
   
         <ng-container matColumnDef="actions">
@@ -39,6 +45,7 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
+    </div>
       <mat-paginator class="paginator" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons
         aria-label="Select page of periodic elements">
       </mat-paginator>

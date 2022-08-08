@@ -7,17 +7,18 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ProductsService } from 'src/app/Product/Services/products.service';
 import { Product } from '../../interfaces/product';
 import { CreateProductDialogComponent } from '../../Dialogs/create-product-dialog/create-product-dialog.component';
-import { ActionStatus } from 'src/app/General/interfaces/action-status';
+import { ActionStatus } from 'src/app/General/Models/action-status';
 import { EditProductDialogComponent } from '../../Dialogs/edit-product-dialog/edit-product-dialog.component';
+import { SignalrService } from 'src/app/SignalR/signalr.service';
 
 @Component({
   selector: 'app-products',
   templateUrl: './products.component.html',
-  styleUrls: ['./products.component.css']
+  styleUrls: ['./products.component.scss']
 })
 export class ProductsComponent implements OnInit {
 
-  displayedColumns: string[] = ['description', 'price', 'actions'];
+  displayedColumns: string[] = ['description', 'price', 'quantity', 'actions'];
   dataSource!: MatTableDataSource<Product>
   deleteProductDialogRef!: MatDialogRef<any>;
   selectedProductId!: number;
@@ -31,14 +32,18 @@ export class ProductsComponent implements OnInit {
 
   TabelErrorMessage!: string
 
+  isProductsLoaded = false;
+
   constructor(
     private ProductsService: ProductsService,
     private dialog: MatDialog,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private _signalrService: SignalrService
   ) { }
 
   ngOnInit(): void {
     this.getProducts();
+    this.subscribeToProductsStockChanged();
   }
 
   getProducts() {
@@ -49,7 +54,7 @@ export class ProductsComponent implements OnInit {
           next: data => {
             this.generateTable(data);
             this.progressBarMode = false;
-
+            this.isProductsLoaded = true;
           },
           error: error => {
             this.TabelErrorMessage = 'Something went wrong please try reloading your browser';
@@ -96,6 +101,7 @@ export class ProductsComponent implements OnInit {
   }
 
   DeleteDialogDeleteClick() {
+    this.DeleteDialogErrorMessage = '';
     this.ProductsService.delete(this.selectedProductId).
       subscribe(
         {
@@ -122,4 +128,27 @@ export class ProductsComponent implements OnInit {
     this._snackBar.open(message, 'ok', { duration: 2500, verticalPosition: 'top', horizontalPosition: 'center' });
   }
 
+  subscribeToProductsStockChanged() {
+    this._signalrService.productsChanged$
+      .subscribe(
+        {
+          next: (products: Product[]) => this.updateProductsStock(products)
+        }
+      )
+  }
+
+  updateProductsStock(newProducts: Product[]) {
+    newProducts.forEach(newProduct => {
+      const index = this.dataSource.data.findIndex(Product => Product.id == newProduct.id);
+
+      const intreval = setInterval(() => {
+        if (this.isProductsLoaded) {
+          if (index != -1) {
+            this.dataSource.data[index].quantity = newProduct.quantity;
+          }
+          clearInterval(intreval);
+        }
+      }, 1000)
+    });
+  }
 }

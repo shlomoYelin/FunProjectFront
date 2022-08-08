@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ActionStatus } from 'src/app/General/interfaces/action-status';
+import { ActionStatus } from 'src/app/General/Models/action-status';
 import { CustomerType } from '../../Enums/customer-type';
 import { Customer } from '../../interfaces/customer';
 import { CustomersService } from '../../Services/customers.service'

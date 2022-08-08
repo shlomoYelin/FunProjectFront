@@ -1,0 +1,25 @@
+@mixin flex-center-wrap {
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+}
+
+.filters {
+    @include flex-center-wrap;
+    border-bottom: 10px solid transparent;
+
+    .btn {
+        margin-bottom: auto;
+        margin-top: auto;
+    }
+
+    .filtersForm {
+        display: contents;
+    }
+}
+
+.loading-spinner {
+    position: absolute;
+    right: 0;
+    top: 3px;
+}

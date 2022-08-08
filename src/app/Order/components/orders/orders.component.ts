@@ -4,16 +4,20 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { ActionStatus } from 'src/app/General/interfaces/action-status';
+import { CustomerType } from 'src/app/Customer/Enums/customer-type';
+import { ActionStatus } from 'src/app/General/Models/action-status';
+import { DateRange } from 'src/app/General/Models/date-range';
+import { SignalrService } from 'src/app/SignalR/signalr.service';
 import { OrderItemsListComponent } from '../../Dialogs/order-items-list/order-items-list.component';
 import { Order } from '../../interfaces/order';
+import { OrderFiltersValuesModel } from '../../Models/order-filters-values-model';
 import { OrdersService } from '../../Services/orders.service';
 
 
 @Component({
   selector: 'app-orders',
   templateUrl: './orders.component.html',
-  styleUrls: ['./orders.component.css']
+  styleUrls: ['./orders.component.scss']
 })
 export class OrdersComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -30,26 +34,65 @@ export class OrdersComponent implements OnInit {
 
   DeleteDialogErrorMessage!: string
 
-  progressBarMode = true;
+  progressBarMode = false;
 
   TabelErrorMessage!: string
+
+  filteresValues!: OrderFiltersValuesModel;
 
   constructor(
     private ordersService: OrdersService,
     private dialog: MatDialog,
     private _snackBar: MatSnackBar) { }
 
+
   ngOnInit(): void {
-    this.getOrders();
   }
 
-  getOrders() {
+  // getOrders() {
+  //   this.progressBarMode = true;
+  //   debugger
+  //   this.ordersService.getAllWithFullName().
+  //     subscribe(
+  //       {
+  //         next: data => {
+  //           this.prepareTable(data);
+  //           this.progressBarMode = false;
+  //         },
+  //         error: error => this.TabelErrorMessage = 'Something went wrong please try reloading your browser'
+  //       }
+  //     )
+  // }
+
+  getFilteredOrders(orderFilters: OrderFiltersValuesModel) {
+    this.filteresValues = orderFilters;
     this.progressBarMode = true;
-    this.ordersService.getAllWithFullName().
+    this.ordersService.getByFiltersWithFullName(orderFilters).
       subscribe(
         {
           next: data => {
             this.prepareTable(data);
+            this.progressBarMode = false;
+          },
+          error: error => this.TabelErrorMessage = 'Something went wrong please try reloading your browser'
+        }
+      )
+  }
+
+  getCsv(orderFilters: OrderFiltersValuesModel) {
+    this.filteresValues = orderFilters;
+    this.progressBarMode = true;
+    this.ordersService.getExcelReportByFilter(orderFilters).
+      subscribe(
+        {
+          next: response => {
+            var link = document.createElement('a');
+            link.href = window.URL.createObjectURL(
+              new Blob([response.body ?? ''], { type: response.headers.get('content-type') ?? '' })
+            );
+            link.download = 'orders';
+            link.click();
+
             this.progressBarMode = false;
           },
           error: error => this.TabelErrorMessage = 'Something went wrong please try reloading your browser'
@@ -78,7 +121,7 @@ export class OrdersComponent implements OnInit {
         {
           next: (data: ActionStatus) => {
             if (data?.success) {
-              this.getOrders();
+              this.getFilteredOrders(this.filteresValues);
               this.deleteOrderDialogRef.close();
               this.openSnackBar('Order deleted successfully')
             }

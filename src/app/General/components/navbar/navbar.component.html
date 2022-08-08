@@ -1,12 +1,39 @@
 <mat-toolbar class="toolbar">
+
+  <div class="notifications" *ngIf="_signalrService.outeOfStockProducts.length">
+    <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+      <mat-icon [matBadge]="_signalrService.outeOfStockProducts.length" matBadgeColor="warn">notifications</mat-icon><!--info-->
+    </button>
+    <mat-menu #menu="matMenu">
+      <span mat-menu-item *ngFor="let product of _signalrService.outeOfStockProducts" [disabled]="true" class="notifications-item">
+        <strong class="message">{{product.description}} is out of stock</strong>
+      </span>
+
+    </mat-menu>
+  </div>
+
   <button class="btn-menu" mat-icon-button aria-label="Example icon-button with menu icon"
     (click)="navListFlag = !navListFlag">
     <mat-icon>menu</mat-icon>
   </button>
-  
-  <mat-nav-list class="nav-list" [ngClass]="{'dropdown-hidden': !navListFlag}" >
+
+  <mat-nav-list class="nav-list" [ngClass]="{'dropdown-hidden': !navListFlag}">
     <a mat-button routerLink="/customers" routerLinkActive="active">Customers</a>
     <a mat-button routerLink="/products" routerLinkActive="active">Products</a>
     <a mat-button routerLink="/orders" routerLinkActive="active">Orders</a>
   </mat-nav-list>
+
+
 </mat-toolbar>
+<!-- <mat-list class="out-of-stock-list">
+
+  <ng-container *ngFor="let product of _signalrService.outOfStockProducts">
+    <mat-list-item *ngIf="!product.isInStock" class="item">
+      <mat-card class="out-of-stock-item-card">
+        <strong class="message">{{product.productName}} is out of stock</strong>
+      </mat-card>
+    </mat-list-item>
+  </ng-container>
+</mat-list> -->
+
+<!-- {{_signalrService.outOfStockProducts.length}} -->

@@ -1,4 +1,4 @@
-<h1 mat-dialog-title>Create new product </h1>
+<h1 mat-dialog-title>Edit product </h1>
 <div mat-dialog-content>
     <form [formGroup]="ProductForm">
         <mat-grid-list cols="2" rowHeight="2:1">
@@ -14,12 +14,22 @@
 
             <mat-grid-tile>
                 <mat-form-field appearance="fill">
+                    <mat-label>Quantity</mat-label>
+                    <input type="number" matInput formControlName="Quantity" min="0">
+                    <mat-error *ngIf="ProductForm.get('Quantity')?.invalid">
+                        Quantity is <strong>required</strong>
+                    </mat-error>
+                </mat-form-field>
+            </mat-grid-tile>
+
+            <mat-grid-tile>
+                <mat-form-field appearance="fill">
                     <mat-label>Price</mat-label>
                     <input type="number" matInput formControlName="Price" min="0.01" step="0.01">
                         <mat-error *ngIf="ProductForm.get('Price')?.invalid">
                             Price is <strong>required</strong>
                         </mat-error>
-
+ 
                 </mat-form-field>
             </mat-grid-tile>
         </mat-grid-list>
