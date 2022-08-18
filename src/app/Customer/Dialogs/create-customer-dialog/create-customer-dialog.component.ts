@@ -14,7 +14,8 @@ export class CreateCustomerDialogComponent implements OnInit {
   CustomerForm: FormGroup = new FormGroup({
     FirstName: new FormControl('', { validators: Validators.required, updateOn: 'change' }),
     LastName: new FormControl('', { validators: Validators.required, updateOn: 'change' }),
-    TypeControl: new FormControl('', { validators: Validators.required, updateOn: 'change' })
+    TypeControl: new FormControl('', { validators: Validators.required, updateOn: 'change' }),
+    PhoneNumber: new FormControl({}, Validators.required)
   });
 
   CustomerTypes = Object.keys(CustomerType).filter((item) => {
@@ -46,7 +47,8 @@ export class CreateCustomerDialogComponent implements OnInit {
       id: 0,
       firstName: this.CustomerForm.get('FirstName')?.value,
       lastName: this.CustomerForm.get('LastName')?.value,
-      type: CustomerType[this.getSelectedCustomerType()]
+      type: CustomerType[this.getSelectedCustomerType()],
+      phone: Object.values((this.CustomerForm.get('PhoneNumber')?.value)).toString().replace(',', '')
     }).
       subscribe(
         {

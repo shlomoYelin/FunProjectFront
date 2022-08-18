@@ -23,6 +23,8 @@ import { EditProductDialogComponent } from './Product/Dialogs/edit-product-dialo
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { TableFiltersComponent } from './Order/components/table-filters/table-filters.component';
 import { SignalrService } from './SignalR/signalr.service';
+import { PhoneNumberControlComponent } from './General/components/phone-number-control/phone-number-control.component';
+import { OnlyNumberDirective } from './General/Directives/only-number.directive';
 
 
 @NgModule({
@@ -42,6 +44,8 @@ import { SignalrService } from './SignalR/signalr.service';
     NotFoundComponent,
     EditProductDialogComponent,
     TableFiltersComponent,
+    PhoneNumberControlComponent,
+    OnlyNumberDirective,
   ],
   imports: [
     BrowserModule,

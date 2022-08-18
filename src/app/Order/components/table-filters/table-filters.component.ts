@@ -1,6 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, filter, Observable, pipe, skipWhile, switchMap, tap } from 'rxjs';
+import { FormControl, FormGroup } from '@angular/forms';
+import { debounceTime, distinctUntilChanged, filter, tap } from 'rxjs';
 import { CustomerType } from 'src/app/Customer/Enums/customer-type';
 import { Customer } from 'src/app/Customer/interfaces/customer';
 import { CustomersService } from 'src/app/Customer/Services/customers.service';
@@ -74,13 +74,6 @@ export class TableFiltersComponent implements OnInit {
           return true;
           new Blob
         }),
-        // skipWhile(val => {
-        //   if (val == '') {
-        //     this.productsAutoCompleteData = [];
-        //     return true;
-        //   }
-        //   return false;
-        // }),
       )
       .subscribe({
         next: val => {

@@ -1,7 +1,5 @@
-import { formatDate } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
@@ -16,7 +14,6 @@ import { OrdersService } from 'src/app/Order/Services/orders.service';
 import { Product } from 'src/app/Product/interfaces/product';
 import { ProductsService } from 'src/app/Product/Services/products.service';
 import { autoCompleteValidat } from 'src/app/Validators/autocomplete-validator';
-import { isObject } from 'src/app/Validators/IsObjectValidator';
 import { notZero } from 'src/app/Validators/number-validator';
 
 
@@ -31,7 +28,6 @@ export class CreateOrderComponent implements OnInit {
   ProductOrderId = 0;
   minDate = new Date();
 
-  // ProductAutoCompleteData!: Observable<Product[]>;
   ProductAutoCompleteData: Product[] = [];
 
 
@@ -41,15 +37,11 @@ export class CreateOrderComponent implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
 
-  // @ViewChild(MatAutocompleteTrigger) autoComplete!: MatAutocompleteTrigger;
-
 
   ProductForm: FormGroup = new FormGroup({
     QuantityControl: new FormControl(null, Validators.compose([Validators.required, notZero])),
     ProductNameControl: new FormControl(null, { validators: [Validators.required, autoCompleteValidat(this.ProductAutoCompleteData)] }),
-    // ProductSelectControl: new FormControl(null, { validators: [Validators.required, isObject] }),
   });
-  // formBuilder: FormBuilder = new FormBuilder();
 
   OrderForm: FormGroup = new FormGroup({
     CustomerControl: new FormControl('', Validators.required),
@@ -273,7 +265,7 @@ export class CreateOrderComponent implements OnInit {
     const errorMessage = this.quantityIsZeroValidator(newQuantity);
     if (errorMessage) {
       this.updateCartItem(productId, 1, errorMessage);
-      return; //לא משנה ל 1 
+      return;
     }
 
     const quantity = parseInt(newQuantity);

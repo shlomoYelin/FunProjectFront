@@ -137,7 +137,7 @@
     <mat-card>
         <mat-card-content>
             <mat-error *ngIf="!(CreationStatus?.success)">
-                {{CreationStatus?.message}}
+                {{CreationStatus.message}}
             </mat-error>
             <form [formGroup]="OrderForm" class="order-form" autocomplete="off">
                 <span class="fields">

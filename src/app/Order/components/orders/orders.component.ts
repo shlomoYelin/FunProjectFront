@@ -4,10 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { CustomerType } from 'src/app/Customer/Enums/customer-type';
 import { ActionStatus } from 'src/app/General/Models/action-status';
-import { DateRange } from 'src/app/General/Models/date-range';
-import { SignalrService } from 'src/app/SignalR/signalr.service';
 import { OrderItemsListComponent } from '../../Dialogs/order-items-list/order-items-list.component';
 import { Order } from '../../interfaces/order';
 import { OrderFiltersValuesModel } from '../../Models/order-filters-values-model';
@@ -48,21 +45,6 @@ export class OrdersComponent implements OnInit {
 
   ngOnInit(): void {
   }
-
-  // getOrders() {
-  //   this.progressBarMode = true;
-  //   debugger
-  //   this.ordersService.getAllWithFullName().
-  //     subscribe(
-  //       {
-  //         next: data => {
-  //           this.prepareTable(data);
-  //           this.progressBarMode = false;
-  //         },
-  //         error: error => this.TabelErrorMessage = 'Something went wrong please try reloading your browser'
-  //       }
-  //     )
-  // }
 
   getFilteredOrders(orderFilters: OrderFiltersValuesModel) {
     this.filteresValues = orderFilters;

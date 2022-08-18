@@ -16,5 +16,4 @@ export class DateService extends Date {
     return d;
     
   }
-
 }

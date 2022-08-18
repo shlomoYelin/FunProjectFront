@@ -47,9 +47,7 @@ a {
     }
 
     .dropdown-hidden {
-        display: none;
-        position: absolute;
-        left: -999px;
+        @include global.hide-element;
     }
 }
 
@@ -57,7 +55,6 @@ a {
     position: absolute;
     top: 123px;
 
-    // background-color: cadetblue;
     .item {
         margin-top: 5%;
         color: red;

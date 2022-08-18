@@ -1,12 +1,11 @@
-import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
-import { debounceTime, distinctUntilChanged, EMPTY, filter, finalize, map, Observable, of, switchMap, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, finalize, map, Observable, of, tap } from 'rxjs';
 import { Customer } from 'src/app/Customer/interfaces/customer';
 import { CustomersService } from 'src/app/Customer/Services/customers.service';
 import { ActionStatus } from 'src/app/General/Models/action-status';
@@ -39,10 +38,6 @@ export class EditOrderComponent implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
 
-  // @ViewChild(MatAutocompleteTrigger) autoCompleteTrigger!: MatAutocompleteTrigger;
-
-  // @ViewChild(MatAutocomplete) auto!: MatAutocomplete;
-
   ProductForm: FormGroup = new FormGroup({
     QuantityControl: new FormControl(null, { validators: [Validators.required, notZero]}),
     ProductNameControl: new FormControl(null, { validators: [Validators.required, autoCompleteValidat(this.ProductAutoCompleteData)] }),
@@ -63,7 +58,6 @@ export class EditOrderComponent implements OnInit {
   ProductFormErrorMessage!: string
   ProductExistsError!: boolean
   isLoading = false;
-  // isProductNotFound = false;
 
   tmpflag = false;
 
@@ -102,8 +96,6 @@ export class EditOrderComponent implements OnInit {
         {
           next: val => {
             console.log('Product Name Change', val);
-            // this.isLoading = true;
-            // this.isProductNotFound = false;
             this.removeProductNameValidators();
             this.fillAutoComplete(val);
           }
@@ -147,18 +139,14 @@ export class EditOrderComponent implements OnInit {
   }
 
   getProductsBySearchValue(val: string) {
-    // let flag = false;
-
     return (
       val ?
         this._productsService.getBySearchValue(val).pipe(map(data => {
-          // flag = data.length == 0;
           return data;
         }))
         : of([])
     ).pipe(finalize(() => {
       this.isLoading = false;
-      // this.isProductNotFound = flag;
     }));
   }
 

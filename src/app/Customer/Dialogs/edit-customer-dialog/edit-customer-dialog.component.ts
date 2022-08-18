@@ -17,8 +17,8 @@ export class EditCustomerDialogComponent implements OnInit {
   EditForm: FormGroup = new FormGroup({
     FirstName: new FormControl('', Validators.required),
     LastName: new FormControl('', Validators.required),
-    TypeControl: new FormControl('', Validators.required)
-
+    TypeControl: new FormControl('', Validators.required),
+    PhoneNumber: new FormControl({}, Validators.required)
   });
   CustomerTypes = Object.keys(CustomerType).filter((item) => {
     return isNaN(Number(item));
@@ -45,12 +45,14 @@ export class EditCustomerDialogComponent implements OnInit {
       this.EditForm.markAllAsTouched();
       return;
     }
+
     this.ServerErrorMessage = '';
     this.CustomerService.update({
       id: this.data.id,
       firstName: this.EditForm.get('FirstName')?.value,
       lastName: this.EditForm.get('LastName')?.value,
-      type: CustomerType[this.getSelectedCustomerType()]
+      type: CustomerType[this.getSelectedCustomerType()],
+      phone: Object.values((this.EditForm.get('PhoneNumber')?.value)).toString().replace(',','')
     })
       .subscribe(
         {

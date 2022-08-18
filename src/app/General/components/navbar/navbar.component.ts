@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Product } from 'src/app/Product/interfaces/product';
 import { ProductsService } from 'src/app/Product/Services/products.service';
 import { SignalrService } from 'src/app/SignalR/signalr.service';
-import { ProductMinimalDetails } from '../../Models/product-minimal-details';
 
 @Component({
   selector: 'app-navbar',

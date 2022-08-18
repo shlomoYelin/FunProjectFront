@@ -21,6 +21,7 @@
                     </mat-error>
                 </mat-form-field>
             </mat-grid-tile>
+
             <mat-grid-tile colspan="2">
                 <mat-form-field>
                     <mat-label>Customer Type</mat-label>
@@ -33,6 +34,10 @@
                         Customer type is <strong>required</strong>
                     </mat-error>
                 </mat-form-field>
+
+                <mat-grid-tile colspan="2">
+                    <app-phone-number-control formControlName="PhoneNumber"></app-phone-number-control>
+                </mat-grid-tile>
             </mat-grid-tile>
         </mat-grid-list>
         <div *ngIf="ServerErrorMessage" class="error-message">

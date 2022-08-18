@@ -1,0 +1,51 @@
+@use '../../styles/global-style.scss' as global;
+
+.phone-number-wrapper {
+    @include global.flex-center-parent;
+    text-align-last: center;
+
+    input {
+        letter-spacing: 0.5em;
+    }
+
+    // ::ng-deep select {
+    //     letter-spacing: 0.5em;
+    // }
+
+    ::ng-deep .mat-option-text {
+        white-space: 0.5em;
+    }
+
+    // .mat-option {
+    //     white-space: 0.5em;
+    // }
+
+     .mat-option-text.mat-option-text {
+        white-space: 0.5em;
+    }
+
+    .prefix-form-field {
+        width: 100px;
+
+        ::ng-deep.mat-select-arrow {
+            border: none;
+        }
+    }
+
+    .phone-number-form {
+        * {
+            margin-inline: 5px;
+        }
+
+        ::ng-deep .mat-form-field-underline {
+            display: none;
+        }
+
+
+    }
+
+
+
+
+
+}

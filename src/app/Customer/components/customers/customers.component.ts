@@ -19,7 +19,7 @@ import { CustomersService } from '../../Services/customers.service';
   styleUrls: ['./customers.component.scss']
 })
 export class CustomersComponent implements OnInit {
-  displayedColumns: string[] = ['firstName', 'lastName', 'type', 'actions'];
+  displayedColumns: string[] = ['firstName', 'lastName', 'type', 'phone', 'actions'];
   ELEMENT_DATA!: Customer[]
   dataSource!: MatTableDataSource<Customer>
   deleteCustomerDialogRef!: MatDialogRef<any>;

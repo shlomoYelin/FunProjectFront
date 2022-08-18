@@ -1,8 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map, switchMap } from 'rxjs';
 import { ActionStatus } from 'src/app/General/Models/action-status';
-import { ProductMinimalDetails } from 'src/app/General/Models/product-minimal-details';
 import { Product } from '../interfaces/product';
 
 @Injectable({
@@ -39,14 +37,5 @@ export class ProductsService {
 
   getAllOutOfStockProducts() {
     return this.http.get<Product[]>(`${this.baseUrl}/GetOutOfStockProducts`);
-      // .pipe(
-      //   map(products => products.map<ProductMinimalDetails>(product => {
-      //     return {
-      //       id: product.id,
-      //       productName: product.description,
-      //       isInStock: false
-      //     }
-      //   }))
-      // )
   }
 }

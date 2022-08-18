@@ -3,3 +3,10 @@
     position: absolute;
     left: -999px;
 }
+
+@mixin flex-center-parent {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+}

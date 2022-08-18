@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { ProductMinimalDetails } from '../General/Models/product-minimal-details';
+import { Subject } from 'rxjs';
 import { Product } from '../Product/interfaces/product';
 
 
@@ -10,10 +9,9 @@ import { Product } from '../Product/interfaces/product';
 })
 export class SignalrService {
   BaseUrl: string = 'https://localhost:7058';
-  // outOfStockProducts1: ProductMinimalDetails[] = [];
   Products: Product[] = [];
 
-  productsChanged$: Subject<Product[]>= new Subject<Product[]>();
+  productsChanged$: Subject<Product[]> = new Subject<Product[]>();
 
   private hubConnection!: signalR.HubConnection;
 
@@ -37,8 +35,7 @@ export class SignalrService {
   }
 
   addDataListener = () => {
-    this.hubConnection.on('sendupdate', (data:Product[]) => {
-      // this.updateOutOfStockProducts(data);
+    this.hubConnection.on('sendupdate', (data: Product[]) => {
       this.updateProducts(data);
       this.productsChanged$.next(data);
     });
@@ -50,18 +47,6 @@ export class SignalrService {
     this.hubConnection.invoke('sendupdate', [])
       .catch(err => console.log('Error while sending message: ' + err))
   }
-
-  // private updateOutOfStockProducts(data: ProductMinimalDetails[]) {
-  //   data.forEach(newProduct => {
-  //     const index = this.outOfStockProducts1.findIndex(product => product.id === newProduct.id);
-  //     if (index == -1) {
-  //       this.outOfStockProducts1.push(newProduct);
-  //     }
-  //     else {
-  //       this.outOfStockProducts1[index] = newProduct;
-  //     }
-  //   })
-  // }
 
   private updateProducts(data: Product[]) {
     data.forEach(newProduct => {

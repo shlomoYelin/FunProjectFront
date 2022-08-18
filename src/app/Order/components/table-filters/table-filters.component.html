@@ -1,21 +1,40 @@
 <div class="filters">
+    <mat-form-field appearance="fill">
+        <mat-label>Enter a date range</mat-label>
+        <mat-date-range-input [formGroup]="dateRange" [rangePicker]="picker">
+            <input matStartDate formControlName="start" placeholder="Start
+                date">
+            <input matEndDate formControlName="end" placeholder="End date">
+        </mat-date-range-input>
+        <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+
+        <mat-error
+            *ngIf="dateRange.controls['start'].hasError('matStartDateInvalid')">Invalid
+            start date</mat-error>
+        <mat-error
+            *ngIf="dateRange.controls['end'].hasError('matEndDateInvalid')">Invalid
+            end date</mat-error>
+    </mat-form-field>
+    
     <form [formGroup]="filtersForm" class="filtersForm">
-        <!-- <mat-form-field appearance="standard">
-            <mat-label>Product name</mat-label>
-            <input formControlName="productNameControl" matInput placeholder="">
-        </mat-form-field> -->
 
         <mat-form-field appearance="standard">
             <mat-label>Product Name</mat-label>
 
-            <mat-spinner class="loading-spinner" *ngIf="isProductsLoading" [diameter]="20"></mat-spinner>
+            <mat-spinner class="loading-spinner" *ngIf="isProductsLoading"
+                [diameter]="20"></mat-spinner>
 
-            <input type="text" aria-label="Number" matInput [matAutocomplete]="productsAuto"
+            <input type="text" aria-label="Number" matInput
+                [matAutocomplete]="productsAuto"
                 formControlName="productNameControl">
 
-            <mat-autocomplete autoActiveFirstOption #productsAuto="matAutocomplete">
+            <mat-autocomplete autoActiveFirstOption
+                #productsAuto="matAutocomplete">
 
-                <mat-option *ngFor="let product of productsAutoCompleteData" [value]="product.description">
+                <mat-option *ngFor="let product of productsAutoCompleteData"
+                    [value]="product.description">
                     {{product.description}}
                 </mat-option>
 
@@ -37,57 +56,46 @@
 
         <mat-form-field appearance="standard">
             <mat-label>Customer Name</mat-label>
-        
-            <mat-spinner class="loading-spinner" *ngIf="isCustomersLoading" [diameter]="20"></mat-spinner>
-        
-            <input type="text" aria-label="Number" matInput [matAutocomplete]="customersAuto"
+
+            <mat-spinner class="loading-spinner" *ngIf="isCustomersLoading"
+                [diameter]="20"></mat-spinner>
+
+            <input type="text" aria-label="Number" matInput
+                [matAutocomplete]="customersAuto"
                 formControlName="customerNameControl">
-        
-            <mat-autocomplete autoActiveFirstOption #customersAuto="matAutocomplete">
-        
-                <mat-option *ngFor="let customer of customersAutoCompleteData" [value]="customer.firstName + ' ' + customer.lastName">
+
+            <mat-autocomplete autoActiveFirstOption
+                #customersAuto="matAutocomplete">
+
+                <mat-option *ngFor="let customer of customersAutoCompleteData"
+                    [value]="customer.firstName + ' ' + customer.lastName">
                     {{customer.firstName + ' ' + customer.lastName}}
                 </mat-option>
-        
+
             </mat-autocomplete>
         </mat-form-field>
-
-        <!-- <mat-form-field appearance="standard">
-            <mat-label>Customer name</mat-label>
-            <input formControlName="customerNameControl" matInput placeholder="">
-        </mat-form-field> -->
 
         <mat-form-field appearance="standard">
             <mat-label>Customer type</mat-label>
             <mat-select formControlName="customerTypeControl" name="food">
                 <mat-option value="all">All</mat-option>
-                <mat-option *ngFor="let type of getCustomersTypse()" [value]="type">
+                <mat-option *ngFor="let type of getCustomersTypse()"
+                    [value]="type">
                     {{type}}
                 </mat-option>
             </mat-select>
         </mat-form-field>
     </form>
 
-    <mat-form-field appearance="fill">
-        <mat-label>Enter a date range</mat-label>
-        <mat-date-range-input [formGroup]="dateRange" [rangePicker]="picker">
-            <input matStartDate formControlName="start" placeholder="Start date">
-            <input matEndDate formControlName="end" placeholder="End date">
-        </mat-date-range-input>
-        <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-date-range-picker #picker></mat-date-range-picker>
 
-        <mat-error *ngIf="dateRange.controls['start'].hasError('matStartDateInvalid')">Invalid start date</mat-error>
-        <mat-error *ngIf="dateRange.controls['end'].hasError('matEndDateInvalid')">Invalid end date</mat-error>
-        <!-- <mat-error *ngIf="dateRange.er">{{dateRange.errors}}</mat-error> -->
-    </mat-form-field>
 
     <button mat-stroked-button class="btn" (click)="btnFilterClick()">
         {{btnfilterText}}
     </button>
 
-    <button matTooltip="Export as excel" mat-stroked-button class="btn" (click)="btnGetCsvClick()">
-        <mat-icon toll>file_download</mat-icon>
+    <button matTooltip="Export as excel" mat-icon-button class="btn"
+        (click)="btnGetCsvClick()">
+        <!-- <mat-icon toll>file_download</mat-icon> -->
+        <mat-icon toll>sim_card_download</mat-icon>
     </button>
 </div>
