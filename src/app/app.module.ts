@@ -25,6 +25,7 @@ import { TableFiltersComponent } from './Order/components/table-filters/table-fi
 import { SignalrService } from './SignalR/signalr.service';
 import { PhoneNumberControlComponent } from './General/components/phone-number-control/phone-number-control.component';
 import { OnlyNumberDirective } from './General/Directives/only-number.directive';
+import { PhoneNumberPipe } from './General/Pipes/phone-number.pipe';
 
 
 @NgModule({
@@ -46,6 +47,7 @@ import { OnlyNumberDirective } from './General/Directives/only-number.directive'
     TableFiltersComponent,
     PhoneNumberControlComponent,
     OnlyNumberDirective,
+    PhoneNumberPipe,
   ],
   imports: [
     BrowserModule,

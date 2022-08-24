@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map, Observable, startWith, switchMap } from 'rxjs';
-import { CustomerType } from 'src/app/Customer/Enums/customer-type';
+import { map, Observable } from 'rxjs';
 import { ActionStatus } from 'src/app/General/Models/action-status';
 import { Order } from '../interfaces/order';
 import { OrderFiltersValuesModel } from '../Models/order-filters-values-model';

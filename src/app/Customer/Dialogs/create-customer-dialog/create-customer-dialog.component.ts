@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
+import { Subject } from 'rxjs';
 import { ActionStatus } from 'src/app/General/Models/action-status';
+import { PhoneNumberService } from 'src/app/General/Services/phone-number.service';
+import { PhoneValidator } from 'src/app/General/Validators/phone-validator';
 import { CustomerType } from '../../Enums/customer-type';
 import { CustomersService } from '../../Services/customers.service'
 
@@ -15,7 +18,7 @@ export class CreateCustomerDialogComponent implements OnInit {
     FirstName: new FormControl('', { validators: Validators.required, updateOn: 'change' }),
     LastName: new FormControl('', { validators: Validators.required, updateOn: 'change' }),
     TypeControl: new FormControl('', { validators: Validators.required, updateOn: 'change' }),
-    PhoneNumber: new FormControl({}, Validators.required)
+    PhoneNumber: new FormControl({}, [Validators.required], PhoneValidator.IsExists(this.PhoneNumberService) )
   });
 
   CustomerTypes = Object.keys(CustomerType).filter((item) => {
@@ -24,12 +27,33 @@ export class CreateCustomerDialogComponent implements OnInit {
 
   ServerErrorMessage!: string;
 
+  errorsSubject$ = new Subject<string>();
+
   constructor(
     private CreateCustomerDialogRef: MatDialogRef<CreateCustomerDialogComponent>,
     private CustomerService: CustomersService,
+    private PhoneNumberService: PhoneNumberService
   ) { }
 
   ngOnInit(): void {
+    this.subscribeToPhoneNumberStatusChanges();
+  }
+
+  subscribeToPhoneNumberStatusChanges() {
+    this.CustomerForm.get('PhoneNumber')?.statusChanges.subscribe(status => {
+      if (status == 'INVALID') {
+        if (this.CustomerForm.get('PhoneNumber')?.hasError('required')) {
+          this.errorsSubject$.next('Number is required.');
+        }
+
+        if (this.CustomerForm.get('PhoneNumber')?.hasError('phoneNumberAlreadyExists')) {
+          this.errorsSubject$.next('Phone number already exists');
+        }
+      }
+      else {
+        this.errorsSubject$.next('');
+      }
+    })
   }
 
   CancelClick() {

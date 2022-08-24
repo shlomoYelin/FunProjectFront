@@ -20,26 +20,30 @@
     //     white-space: 0.5em;
     // }
 
-     .mat-option-text.mat-option-text {
-        white-space: 0.5em;
-    }
+    //  .mat-option-text.mat-option-text {
+    //     white-space: 0.5em;
+    // }
 
     .prefix-form-field {
-        width: 100px;
+        width: 20%;
 
         ::ng-deep.mat-select-arrow {
             border: none;
         }
     }
 
+    .number-form-field{
+        width: 50%;
+    }
+
     .phone-number-form {
         * {
-            margin-inline: 5px;
+            margin-inline: 2px;
         }
 
-        ::ng-deep .mat-form-field-underline {
-            display: none;
-        }
+        // ::ng-deep .mat-form-field-underline {
+        //     display: none;
+        // }
 
 
     }

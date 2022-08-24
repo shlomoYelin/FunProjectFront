@@ -13,38 +13,6 @@
             <span class="list-footer">
                 <form [formGroup]="ProductForm">
 
-                    <!-- <mat-form-field class="example-full-width" appearance="fill">
-                        <mat-label>Product Name</mat-label>
-                        <input type="text" placeholder="Pick one" aria-label="Number" matInput
-                            formControlName="ProductSelectControl" [matAutocomplete]="auto">
-                        <mat-autocomplete #auto="matAutocomplete" [displayWith]="productNameDisplayFn"
-                            (opened)="autoCompleteOpened()" (optionSelected)="autoCompleteOptionSelected()">
-
-                            <ng-container *ngFor="let product of ProductAutoCompleteData">
-                                <mat-option *ngIf="!isLoading" [value]="product">
-                                    {{product.description}}
-                                </mat-option>
-                            </ng-container>
-
-                            <mat-option *ngIf="isLoading" disabled style="color: black!important;">
-                                Loading...
-                            </mat-option>
-                            <mat-option *ngIf="isProductNotFound" disabled style="color: red!important;">
-                                <small>Product not found.</small>
-                            </mat-option>
-                        </mat-autocomplete>
-                        <mat-error *ngIf="ProductForm.get('ProductSelectControl')?.invalid">
-                            <span *ngIf="ProductForm.controls['ProductSelectControl'].hasError('incorrect') &&
-                            !(ProductForm.controls['ProductSelectControl'].hasError('required'))">
-                                Please select a product from the <strong>list</strong>
-                            </span>
-
-                            <span *ngIf="ProductForm.controls['ProductSelectControl'].hasError('required')">
-                                Product is <strong>required</strong>
-                            </span>
-                        </mat-error>
-                    </mat-form-field> -->
-
                     <mat-form-field class="example-full-width">
                         <mat-label>Product Name</mat-label>
 
@@ -74,7 +42,6 @@
                             </span>
 
                         </mat-error>
-                        <!-- <mat-hint class="product-not-found-hint" align="start" *ngIf="isProductNotFound">Product not found</mat-hint> -->
                     </mat-form-field>
 
                     <mat-form-field class="quantity">
@@ -92,10 +59,7 @@
                     </mat-form-field>
                     <div class="price-summary">
                         <label class="price">Price:{{ProductPrice}}</label>
-                        <!-- <label>isProductNotFound: {{isProductNotFound}}</label> -->
-                        <!-- <label>isLoading: {{isLoading}}</label> -->
-                        <!-- <button type="button" (click)="validateAutoComplete()">click</button> -->
-                    </div>
+                     </div>
 
                     <button type="button" class="btn btn-primary" matTooltip="Add to cart" (click)="add2cardClick()"
                         color="primary" class="btn-add2card" mat-mini-fab>

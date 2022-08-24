@@ -40,19 +40,7 @@
 
             </mat-autocomplete>
 
-            <!-- <mat-error *ngIf="filtersForm.get('productNameControl')?.invalid">
-                <span
-                    *ngIf="filtersForm.controls['productNameControl'].hasError('not-found') &&
-                                                            !(filtersForm.controls['productNameControl'].hasError('required'))">
-                    Please select a product from the <strong>list</strong>
-                </span>
-
-                <span *ngIf="filtersForm.controls['productNameControl'].hasError('required')">
-                    Product is <strong>required</strong>
-                </span>
-
-            </mat-error> -->
-        </mat-form-field>
+           </mat-form-field>
 
         <mat-form-field appearance="standard">
             <mat-label>Customer Name</mat-label>
@@ -95,7 +83,6 @@
 
     <button matTooltip="Export as excel" mat-icon-button class="btn"
         (click)="btnGetCsvClick()">
-        <!-- <mat-icon toll>file_download</mat-icon> -->
         <mat-icon toll>sim_card_download</mat-icon>
     </button>
 </div>

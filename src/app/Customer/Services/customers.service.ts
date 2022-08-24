@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ActionStatus } from 'src/app/General/Models/action-status';
 import { Customer } from '../interfaces/customer';
@@ -16,7 +16,10 @@ export class CustomersService {
   }
 
   getBySearchValue(searchValue: string) {
-    return this.http.get<Customer[]>(`${this.baseUrl}/GetCustomersBySearchValue/${searchValue}`)
+    let params = new HttpParams().set('searchValue', searchValue);
+
+    return this.http.get<Customer[]>(`${this.baseUrl}/GetCustomersBySearchValue/`,{params: params})
+    // return this.http.get<Customer[]>(`${this.baseUrl}/GetCustomersBySearchValue/${searchValue}`)
   }
   
   create(customer: Customer) {

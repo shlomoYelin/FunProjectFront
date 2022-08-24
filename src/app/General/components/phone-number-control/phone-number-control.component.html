@@ -1,41 +1,37 @@
 <div class="phone-number-wrapper">
     <form [formGroup]="phoneNumberForm" class="phone-number-form">
-        <!-- 'legacy' | 'standard' | 'fill' | 'outline' -->
+
         <mat-form-field class="prefix-form-field">
             <mat-label>Prefix</mat-label>
             <mat-select formControlName="prefix">
-                <!-- <mat-option *ngFor="let food of foods" [value]="food.value">
-                {{food.viewValue}}
-            </mat-option> -->
-                <!-- <mat-option>fdfsd</mat-option>
-            <mat-option>fdfsd</mat-option> -->
                 <mat-option *ngFor="let phoneNumberType of phoneNumberTypes" [value]="phoneNumberType.prefix">
                     {{phoneNumberType.prefix}}</mat-option>
             </mat-select>
         </mat-form-field>
+
         <strong><span>&ndash;</span></strong>
-        <mat-form-field matTooltip="{{numberControlToolTipMessage}}"
+
+        <mat-form-field class="number-form-field" matTooltip="{{numberControlToolTipMessage}}"
             [matTooltipDisabled]="!numberControlToolTipMessage">
             <mat-label>Number</mat-label>
 
-            <input OnlyNumber #number formControlName="number" matInput placeholder="{{'1'.repeat(numberLength)}}">
+            <input (blur)="numberControlBlur()" OnlyNumber [maxlength]="7" #number formControlName="number" matInput
+                placeholder="{{'1'.repeat(7)}}">
 
-            <!-- <mat-hint *ngIf="numberLength > 0" align="end">{{number.value.length}} / {{numberLength}}</mat-hint> -->
-            <span matSuffix *ngIf="numberLength > 0">{{number.value.length}} / {{numberLength}}</span>
+            <mat-icon matSuffix>phone</mat-icon>
 
-            <mat-error *ngIf="phoneNumberForm.get('number')?.hasError('required')">number is required</mat-error>
+            <mat-error *ngIf="parentErrorMessage">{{parentErrorMessage}}</mat-error>
 
             <mat-error *ngIf="phoneNumberForm.get('number')?.hasError('pattern'); else lenError;">Please enter
                 valid phone number
             </mat-error>
 
             <ng-template #lenError>
-                <mat-error
-                    *ngIf="phoneNumberForm.get('number')?.hasError('maxlength') || phoneNumberForm.get('number')?.hasError('minlength')">
-                    The number must contain {{numberLength}} digits</mat-error>
+                <mat-error *ngIf="phoneNumberForm.get('number')?.hasError('minlength')">
+                    The number must contain 7 digits</mat-error>
             </ng-template>
 
         </mat-form-field>
-        <mat-divider></mat-divider>
+
     </form>
 </div>

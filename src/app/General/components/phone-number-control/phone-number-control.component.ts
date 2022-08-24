@@ -1,6 +1,8 @@
-import { Component, forwardRef, Input, OnInit } from '@angular/core';
+import { Component, ContentChild, forwardRef, Input, OnInit } from '@angular/core';
 import { ControlValueAccessor, FormControl, FormControlStatus, FormGroup, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
+import { distinctUntilChanged, Subject } from 'rxjs';
 import { PhoneCategory } from '../../Enums/phone-category';
+import { PhoneNumber } from '../../Models/phone-number';
 import { PhoneNumberType } from '../../Models/phone-number-type';
 import { PhoneNumberService } from '../../Services/phone-number.service';
 
@@ -13,58 +15,111 @@ import { PhoneNumberService } from '../../Services/phone-number.service';
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => PhoneNumberControlComponent),
       multi: true
-    }
+    },
+    // {
+    //   provide: NG_VALIDATORS,
+    //   useExisting: forwardRef(() => PhoneNumberControlComponent),
+    //   multi: true,
+    // }
   ]
 })
-export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor {
+export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor//, Validator
+{
   phoneNumberForm = new FormGroup({
-    prefix: new FormControl('', Validators.required),
+    prefix: new FormControl('',
+    ),
     number: new FormControl('', {
       validators: [
-        Validators.required,
+        Validators.minLength(7),
         Validators.pattern('^\\d+$')
       ]
     }),
   });
 
   @Input() phoneCategory!: PhoneCategory;
+  @Input() parentErrorsSubjectInput$!: Subject<string>;
+
+  parentErrorMessage = '';
+
+  parentErrorType = '';
+
+  onTouched = () => { };
+  onChange = (_: any) => { };
 
   phoneNumberTypes: PhoneNumberType[] = [];
 
-  numberLength = 0;
-
   numberControlToolTipMessage = 'you have to choose a number prefix first';
 
+  constructor(
+    public phoneNumberService: PhoneNumberService,
+    // @Optional() @Self() public ngControl: NgControl
+  ) { }
 
-  constructor(public phoneNumberService: PhoneNumberService) { }
+  // validate(control: AbstractControl): ValidationErrors | null {
+  //   console.log('validate');
 
-  writeValue(obj: any): void {
-    throw new Error('Method not implemented.');
-  }
+  //   return this.phoneNumberForm.invalid ? { internal: true } : null;
+  // }
 
-  registerOnChange(fn: any): void {
-    throw new Error('Method not implemented.');
-  }
-
-  registerOnTouched(fn: any): void {
-    throw new Error('Method not implemented.');
-  }
 
   ngOnInit(): void {
     this.getPhoneNumberTypes();
     this.phoneNumberForm.get('number')?.disable();
     this.enableNumberControlOnPrefixValid();
     this.clearNumberControlToolTipMessageOnPrefixValid();
-    this.updateNumberControlLengthOnPrefixChange();
+    this.subscribeToNumberControl();
+    this.subscribeToParentErrorInput();
+  }
 
-    // this.phoneNumberForm.get('number')?.statusChanges.subscribe((status: FormControlStatus) => {
-    //   if (status == 'INVALID') {
-    //     console.log('errors');
+  writeValue(obj: any): void {
+    this.phoneNumberForm.patchValue(obj);
+    this.phoneNumberForm.updateValueAndValidity();
+  }
 
-    //     console.log(this.phoneNumberForm.get('number')?.errors);
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
 
-    //   }
-    // });
+  registerOnTouched(fn: any): void {
+    this.onTouched = fn;
+  }
+
+  subscribeToParentErrorInput() {
+    const tmpValidator = (_: any) => { return { 'aaa': false } };
+    this.parentErrorsSubjectInput$.subscribe(errorMessage => {
+      if (errorMessage) {
+        this.phoneNumberForm.get('number')?.addValidators(tmpValidator);
+        this.parentErrorMessage = errorMessage;
+        this.phoneNumberForm.get('number')?.updateValueAndValidity();
+      }
+      else {
+        this.phoneNumberForm.get('number')?.removeValidators(tmpValidator);
+        this.parentErrorMessage = errorMessage;
+      }
+    });
+  }
+
+  numberControlBlur() {
+    const val = this.phoneNumberForm.get('number')?.value;
+    if (!val) {
+      this.onChange(null);
+    }
+  }
+
+  subscribeToNumberControl() {
+    this.phoneNumberForm
+      .valueChanges
+      .pipe(distinctUntilChanged((prev: PhoneNumber, current: PhoneNumber) => {
+        return prev.number == current.number;
+      }))
+      .subscribe(val => {
+        if (val.number) {
+          this.onChange(val);
+        }
+        else if (this.phoneNumberForm.get('number')?.dirty) {
+          this.onChange(null);
+        }
+      });
   }
 
   getPhoneNumberTypes() {
@@ -76,7 +131,6 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
 
   enableNumberControlOnPrefixValid() {
     this.phoneNumberForm.get('prefix')?.statusChanges.subscribe((status: FormControlStatus) => {
-      console.log(status);
       if (status === 'VALID') {
         this.phoneNumberForm.get('number')?.enable();
       }
@@ -85,24 +139,10 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
 
   clearNumberControlToolTipMessageOnPrefixValid() {
     this.phoneNumberForm.get('prefix')?.statusChanges.subscribe((status: FormControlStatus) => {
-      console.log(status);
       if (status === 'VALID') {
         this.numberControlToolTipMessage = '';
       }
     });
   }
-
-  updateNumberControlLengthOnPrefixChange() {
-    this.phoneNumberForm.get('prefix')?.valueChanges.subscribe(value => {
-      this.numberLength = this.phoneNumberTypes.find(t => t.prefix == value)?.length ?? 0;
-
-      this.phoneNumberForm.get('number')
-        ?.addValidators([Validators.maxLength(this.numberLength), Validators.minLength(this.numberLength)]);
-
-      this.phoneNumberForm.get('number')?.updateValueAndValidity();
-
-    });
-  }
-
 
 }

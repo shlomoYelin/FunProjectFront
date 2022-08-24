@@ -22,7 +22,7 @@
                 </mat-form-field>
             </mat-grid-tile>
 
-            <mat-grid-tile colspan="2">
+            <mat-grid-tile>
                 <mat-form-field>
                     <mat-label>Customer Type</mat-label>
                     <mat-select formControlName="TypeControl">
@@ -30,14 +30,16 @@
                             {{type}}
                         </mat-option>
                     </mat-select>
+
                     <mat-error *ngIf="CustomerForm.get('TypeControl')?.invalid">
                         Customer type is <strong>required</strong>
                     </mat-error>
                 </mat-form-field>
             </mat-grid-tile>
 
-            <mat-grid-tile colspan="2">
-                <app-phone-number-control formControlName="PhoneNumber"></app-phone-number-control>
+            <mat-grid-tile>
+                <app-phone-number-control formControlName="PhoneNumber" [parentErrorsSubjectInput$]="errorsSubject$">
+                </app-phone-number-control>
             </mat-grid-tile>
         </mat-grid-list>
 
