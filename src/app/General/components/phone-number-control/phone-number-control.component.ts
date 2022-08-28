@@ -49,6 +49,7 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
   phoneNumberTypes: PhoneNumberType[] = [];
 
   numberControlToolTipMessage = 'you have to choose a number prefix first';
+
   ngControl!: NgControl
   // constructor(
   //   public phoneNumberService: PhoneNumberService,
@@ -74,14 +75,14 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
 
 
   ngOnInit(): void {
-    this.ngControl = this.inj.get(NgControl)
+    this.ngControl = this.inj.get(NgControl);
     this.getPhoneNumberTypes();
     this.phoneNumberForm.get('number')?.disable();
     this.enableNumberControlOnPrefixValid();
     this.clearNumberControlToolTipMessageOnPrefixValid();
-    this.subscribeToNumberControl();
+    this.subscribeToPhoneNumberForm();
     this.subscribeToParentErrorInput();
-    // console.log(this.ngControl.control?.validator);
+    console.log(this.ngControl);
     
   }
 
@@ -120,13 +121,15 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
     }
   }
 
-  subscribeToNumberControl() {
+  subscribeToPhoneNumberForm() {
     this.phoneNumberForm
       .valueChanges
-      .pipe(distinctUntilChanged((prev: PhoneNumber, current: PhoneNumber) => {
-        return prev.number == current.number;
-      }))
+      // .pipe(distinctUntilChanged((prev: PhoneNumber, current: PhoneNumber) => {
+      //   return prev.number == current.number;
+      // }))
       .subscribe(val => {
+        console.log(this.ngControl);
+
         if (val.number) {
           this.onChange(val);
         }
