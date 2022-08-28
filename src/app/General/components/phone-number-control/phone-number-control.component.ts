@@ -1,5 +1,5 @@
-import { Component, ContentChild, forwardRef, Input, OnInit } from '@angular/core';
-import { ControlValueAccessor, FormControl, FormControlStatus, FormGroup, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
+import { Component, ContentChild, forwardRef, Injector, Input, OnInit, Optional, Self } from '@angular/core';
+import { ControlValueAccessor, FormControl, FormControlStatus, FormGroup, NgControl, NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
 import { distinctUntilChanged, Subject } from 'rxjs';
 import { PhoneCategory } from '../../Enums/phone-category';
 import { PhoneNumber } from '../../Models/phone-number';
@@ -49,11 +49,22 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
   phoneNumberTypes: PhoneNumberType[] = [];
 
   numberControlToolTipMessage = 'you have to choose a number prefix first';
-
+  ngControl!: NgControl
+  // constructor(
+  //   public phoneNumberService: PhoneNumberService,
+  //   @Optional() @Self() public ngControl: NgControl
+  // ) { 
+  //   // if (this.ngControl) {
+  //     this.ngControl.valueAccessor = this;
+  //   // }
+  // }
+  
   constructor(
     public phoneNumberService: PhoneNumberService,
-    // @Optional() @Self() public ngControl: NgControl
-  ) { }
+    private inj: Injector
+  ) {
+    
+  }
 
   // validate(control: AbstractControl): ValidationErrors | null {
   //   console.log('validate');
@@ -63,12 +74,15 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
 
 
   ngOnInit(): void {
+    this.ngControl = this.inj.get(NgControl)
     this.getPhoneNumberTypes();
     this.phoneNumberForm.get('number')?.disable();
     this.enableNumberControlOnPrefixValid();
     this.clearNumberControlToolTipMessageOnPrefixValid();
     this.subscribeToNumberControl();
     this.subscribeToParentErrorInput();
+    // console.log(this.ngControl.control?.validator);
+    
   }
 
   writeValue(obj: any): void {
