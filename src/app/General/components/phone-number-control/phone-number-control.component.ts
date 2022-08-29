@@ -15,11 +15,11 @@ import { PhoneNumberService } from '../../Services/phone-number.service';
       useExisting: forwardRef(() => PhoneNumberControlComponent),
       multi: true
     },
-    // {
-    //   provide: NG_VALIDATORS,
-    //   useExisting: forwardRef(() => PhoneNumberControlComponent),
-    //   multi: true,
-    // }
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => PhoneNumberControlComponent),
+      multi: true,
+    }
   ]
 })
 export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor//, Validator
@@ -60,9 +60,9 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
   //   public phoneNumberService: PhoneNumberService,
   //   @Optional() @Self() public ngControl: NgControl
   // ) { 
-  //   // if (this.ngControl) {
-  //     // this.ngControl.valueAccessor = this;
-  //   // }
+  //   if (this.ngControl) {
+  //     this.ngControl.valueAccessor = this;
+  //   }
   // }
 
   constructor(
@@ -82,7 +82,9 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
 
   ngOnInit(): void {
     this.ngControl = this.inj.get(NgControl);
-    console.log('ngOnInit',this.ngControl.validator?.({} as AbstractControl));
+    console.log('ngOnInit', this.ngControl.validator?.({} as AbstractControl));
+    console.log('ngOnInit',this.controlContainer.validator?.({} as AbstractControl));
+    
     
     this.getPhoneNumberTypes();
     this.phoneNumberForm.get('number')?.disable();

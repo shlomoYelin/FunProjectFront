@@ -9,14 +9,14 @@ export class PhoneValidator {
             console.log(control.value);
             
             if (!control.value.number || control.value.number?.length < 7 || prevPhoneNumber == (control.value.prefix + control.value.number)) {
-                console.log('adfsfsdgfs');
-                console.log(control.value);
+                // console.log('adfsfsdgfs');
+                // console.log(control.value);
                 
                 return of(null as unknown as ValidationErrors);                
             }
 
             const phoneNumber = control.value.prefix + control.value.number;
-            console.log(phoneNumber);
+            // console.log(phoneNumber);
             
             return phoneNumberService
                 .isPhoneNumberExist(phoneNumber)
