@@ -1,8 +1,7 @@
-import { Component, ContentChild, forwardRef, Injector, Input, OnInit, Optional, Self } from '@angular/core';
-import { ControlValueAccessor, FormControl, FormControlStatus, FormGroup, NgControl, NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
-import { distinctUntilChanged, Subject } from 'rxjs';
+import { AfterViewInit, Component, forwardRef, Injector, Input, OnInit } from '@angular/core';
+import { AbstractControl, ControlContainer, ControlValueAccessor, FormControl, FormControlStatus, FormGroup, NgControl, NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
 import { PhoneCategory } from '../../Enums/phone-category';
-import { PhoneNumber } from '../../Models/phone-number';
 import { PhoneNumberType } from '../../Models/phone-number-type';
 import { PhoneNumberService } from '../../Services/phone-number.service';
 
@@ -23,7 +22,7 @@ import { PhoneNumberService } from '../../Services/phone-number.service';
     // }
   ]
 })
-export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor//, Validator
+export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor, AfterViewInit//, Validator
 {
   phoneNumberForm = new FormGroup({
     prefix: new FormControl('',
@@ -51,6 +50,11 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
   numberControlToolTipMessage = 'you have to choose a number prefix first';
 
   ngControl!: NgControl
+
+  control!: AbstractControl;
+
+  @Input()
+  formControlName!: string;
   // constructor(
   //   public phoneNumberService: PhoneNumberService,
   //   @Optional() @Self() public ngControl: NgControl
@@ -59,12 +63,13 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
   //     this.ngControl.valueAccessor = this;
   //   // }
   // }
-  
+
   constructor(
     public phoneNumberService: PhoneNumberService,
-    private inj: Injector
+    private inj: Injector,
+    private controlContainer: ControlContainer
   ) {
-    
+
   }
 
   // validate(control: AbstractControl): ValidationErrors | null {
@@ -82,8 +87,13 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
     this.clearNumberControlToolTipMessageOnPrefixValid();
     this.subscribeToPhoneNumberForm();
     this.subscribeToParentErrorInput();
-    console.log(this.ngControl);
-    
+
+  }
+
+  ngAfterViewInit(): void {
+    console.log(this.ngControl.control?.validator);
+    // console.log(this.controlContainer?.control?.get(this.formControlName)?.)
+    // this.control = this.controlContainer?.control?.get(this.formControlName);
   }
 
   writeValue(obj: any): void {
@@ -110,6 +120,7 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
       else {
         this.phoneNumberForm.get('number')?.removeValidators(tmpValidator);
         this.parentErrorMessage = errorMessage;
+
       }
     });
   }
@@ -128,8 +139,8 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
       //   return prev.number == current.number;
       // }))
       .subscribe(val => {
-        console.log(this.ngControl);
-
+        console.log(this.ngControl.control);
+        console.log(this.controlContainer?.control?.get(this.formControlName))
         if (val.number) {
           this.onChange(val);
         }
