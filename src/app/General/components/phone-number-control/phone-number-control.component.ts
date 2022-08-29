@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, forwardRef, Injector, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, forwardRef, Injector, Input, OnInit, Optional, Self } from '@angular/core';
 import { AbstractControl, ControlContainer, ControlValueAccessor, FormControl, FormControlStatus, FormGroup, NgControl, NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { PhoneCategory } from '../../Enums/phone-category';
@@ -22,7 +22,7 @@ import { PhoneNumberService } from '../../Services/phone-number.service';
     // }
   ]
 })
-export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor, AfterViewInit//, Validator
+export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor//, Validator
 {
   phoneNumberForm = new FormGroup({
     prefix: new FormControl('',
@@ -55,12 +55,13 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
 
   @Input()
   formControlName!: string;
+  
   // constructor(
   //   public phoneNumberService: PhoneNumberService,
   //   @Optional() @Self() public ngControl: NgControl
   // ) { 
   //   // if (this.ngControl) {
-  //     this.ngControl.valueAccessor = this;
+  //     // this.ngControl.valueAccessor = this;
   //   // }
   // }
 
@@ -81,6 +82,8 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
 
   ngOnInit(): void {
     this.ngControl = this.inj.get(NgControl);
+    console.log('ngOnInit',this.ngControl.validator?.({} as AbstractControl));
+    
     this.getPhoneNumberTypes();
     this.phoneNumberForm.get('number')?.disable();
     this.enableNumberControlOnPrefixValid();
@@ -90,11 +93,11 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
 
   }
 
-  ngAfterViewInit(): void {
-    console.log(this.ngControl.control?.validator);
-    // console.log(this.controlContainer?.control?.get(this.formControlName)?.)
-    // this.control = this.controlContainer?.control?.get(this.formControlName);
-  }
+  // ngAfterViewInit(): void {
+  //   console.log(this.ngControl.control?.validator);
+  //   // console.log(this.controlContainer?.control?.get(this.formControlName)?.)
+  //   // this.control = this.controlContainer?.control?.get(this.formControlName);
+  // }
 
   writeValue(obj: any): void {
     this.phoneNumberForm.patchValue(obj);
@@ -139,8 +142,8 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
       //   return prev.number == current.number;
       // }))
       .subscribe(val => {
-        console.log(this.ngControl.control);
-        console.log(this.controlContainer?.control?.get(this.formControlName))
+        // console.log(this.ngControl.control);
+        // console.log(this.controlContainer?.control?.get(this.formControlName))
         if (val.number) {
           this.onChange(val);
         }
