@@ -7,6 +7,7 @@
                 <mat-option *ngFor="let phoneNumberType of phoneNumberTypes" [value]="phoneNumberType.prefix">
                     {{phoneNumberType.prefix}}</mat-option>
             </mat-select>
+            <mat-error *ngIf="phoneNumberForm.get('prefix')?.hasError('required')">required</mat-error>
         </mat-form-field>
 
         <strong><span>&ndash;</span></strong>
@@ -32,6 +33,5 @@
             </ng-template>
 
         </mat-form-field>
-
     </form>
 </div>

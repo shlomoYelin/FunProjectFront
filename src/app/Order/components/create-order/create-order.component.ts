@@ -92,7 +92,6 @@ export class CreateOrderComponent implements OnInit {
       .subscribe(
         {
           next: val => {
-            console.log('Product Name Change', val);
             this.isLoading = true;
             this.removeProductNameValidators();
             this.fillAutoComplete(val);
@@ -326,7 +325,6 @@ export class CreateOrderComponent implements OnInit {
 
   updateCartItem(productId: number, newQuantity: number, errorMessage: string = '') {
     const productPrice = this.Products.find(p => p.id == productId)?.price;
-    console.log('newQuantity: ', newQuantity);
 
     this.Cart.data.some(productOrder => {
       if (productOrder.productId == productId) {
@@ -337,7 +335,6 @@ export class CreateOrderComponent implements OnInit {
       }
       return false;
     })
-    console.log('cart:', this.Cart.data);
 
     this.generateItemsTable();
   }

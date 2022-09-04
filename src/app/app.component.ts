@@ -8,9 +8,4 @@ import { PhoneCategory } from './General/Enums/phone-category';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  phoneCategory!: PhoneCategory;
-
-  // ff() {
-  //   this.phoneCategory = PhoneCategory.Emergency;
-  // }
 }

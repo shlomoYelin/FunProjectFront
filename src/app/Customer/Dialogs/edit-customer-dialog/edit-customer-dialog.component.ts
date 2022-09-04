@@ -24,6 +24,7 @@ export class EditCustomerDialogComponent implements OnInit {
     TypeControl: new FormControl('', Validators.required),
     PhoneNumber: new FormControl({}, Validators.required, PhoneValidator.IsExists(this.PhoneNumberService, this.data.phone))
   });
+
   CustomerTypes = Object.keys(CustomerType).filter((item) => {
     return isNaN(Number(item));
   });
@@ -63,8 +64,6 @@ export class EditCustomerDialogComponent implements OnInit {
 
   subscribeToPhoneNumberStatusChanges() {
     this.EditForm.get('PhoneNumber')?.statusChanges.subscribe(status => {
-      console.log('status changes', status);
-
       if (status == 'INVALID') {
         if (this.EditForm.get('PhoneNumber')?.hasError('required')) {
           this.errorsSubject$.next('Number is required.');
@@ -81,21 +80,12 @@ export class EditCustomerDialogComponent implements OnInit {
   }
 
   UpdateClick() {
-    if (this.EditForm.invalid) {
-      this.EditForm.markAllAsTouched();
-      console.log('Update failde' );
-
+    if (!this.isFormValid()) {
       return;
     }
 
     this.ServerErrorMessage = '';
-    this.CustomerService.update({
-      id: this.data.id,
-      firstName: this.EditForm.get('FirstName')?.value,
-      lastName: this.EditForm.get('LastName')?.value,
-      type: CustomerType[this.getSelectedCustomerType()],
-      phone: Object.values((this.EditForm.get('PhoneNumber')?.value)).toString().replace(',', '')
-    })
+    this.updateCustomer()
       .subscribe(
         {
           next: (actionStatus: ActionStatus) => {
@@ -108,9 +98,32 @@ export class EditCustomerDialogComponent implements OnInit {
           },
           error: (error: any) => this.ServerErrorMessage = 'Action failed please try again'
         }
-
-
       )
+  }
+
+  updateCustomer() {
+    return this.CustomerService.update({
+      id: this.data.id,
+      firstName: this.EditForm.get('FirstName')?.value,
+      lastName: this.EditForm.get('LastName')?.value,
+      type: CustomerType[this.getSelectedCustomerType()],
+      phone: Object.values((this.EditForm.get('PhoneNumber')?.value)).toString().replace(',', '')
+    })
+  }
+
+  isFormValid() {
+    let toReturn = true;
+    if (this.EditForm.invalid) {
+      this.EditForm.markAllAsTouched();
+      toReturn = false;
+    }
+
+    if (this.EditForm.get('PhoneNumber')?.value != null && Object.keys(this.EditForm.get('PhoneNumber')?.value).length == 0) {
+      this.errorsSubject$.next('required');
+      toReturn = false;
+    }
+
+    return toReturn;
   }
 
   CancelClick() {

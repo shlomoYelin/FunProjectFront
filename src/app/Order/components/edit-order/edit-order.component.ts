@@ -95,7 +95,6 @@ export class EditOrderComponent implements OnInit {
       .subscribe(
         {
           next: val => {
-            console.log('Product Name Change', val);
             this.removeProductNameValidators();
             this.fillAutoComplete(val);
           }
@@ -165,7 +164,6 @@ export class EditOrderComponent implements OnInit {
   }
 
   setDatePickerFilter() {
-    console.log('setDatePickerFilter');
 
     this.datePickerFilter = (date: Date | null): boolean => {
       const today = new Date();
@@ -352,8 +350,6 @@ export class EditOrderComponent implements OnInit {
     let errorMessage = '';
     errorMessage = this.quantityIsZeroValidator( quantityStr);
     errorMessage = errorMessage ?? this.parseQuantityValidator(productId, quantityStr);
-
-    console.log('errorMessage: ', errorMessage);
 
     if(errorMessage) this.setProductOrderErrorMessage(productId, errorMessage);
   }

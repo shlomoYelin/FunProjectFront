@@ -18,7 +18,7 @@ export class CreateCustomerDialogComponent implements OnInit {
     FirstName: new FormControl('', { validators: Validators.required, updateOn: 'change' }),
     LastName: new FormControl('', { validators: Validators.required, updateOn: 'change' }),
     TypeControl: new FormControl('', { validators: Validators.required, updateOn: 'change' }),
-    PhoneNumber: new FormControl({}, [Validators.required], PhoneValidator.IsExists(this.PhoneNumberService) )
+    PhoneNumber: new FormControl({}, [Validators.required], PhoneValidator.IsExists(this.PhoneNumberService))
   });
 
   CustomerTypes = Object.keys(CustomerType).filter((item) => {
@@ -53,7 +53,8 @@ export class CreateCustomerDialogComponent implements OnInit {
       else {
         this.errorsSubject$.next('');
       }
-    })
+    });
+
   }
 
   CancelClick() {
@@ -61,20 +62,14 @@ export class CreateCustomerDialogComponent implements OnInit {
   }
 
   CreateCustomerClick() {
-    if (this.CustomerForm.invalid) {
-      this.CustomerForm.markAllAsTouched();
+    if (!this.isFormValid()) {
       return;
     }
+
     this.ServerErrorMessage = '';
 
-    this.CustomerService.create({
-      id: 0,
-      firstName: this.CustomerForm.get('FirstName')?.value,
-      lastName: this.CustomerForm.get('LastName')?.value,
-      type: CustomerType[this.getSelectedCustomerType()],
-      phone: Object.values((this.CustomerForm.get('PhoneNumber')?.value)).toString().replace(',', '')
-    }).
-      subscribe(
+    this.createCustomer()
+      .subscribe(
         {
           next: (actionStatus: ActionStatus) => {
             if (actionStatus.success) {
@@ -87,6 +82,31 @@ export class CreateCustomerDialogComponent implements OnInit {
           error: (error: any) => this.ServerErrorMessage = 'Action failed please try again'
         }
       );
+  }
+
+  createCustomer() {
+    return this.CustomerService.create({
+      id: 0,
+      firstName: this.CustomerForm.get('FirstName')?.value,
+      lastName: this.CustomerForm.get('LastName')?.value,
+      type: CustomerType[this.getSelectedCustomerType()],
+      phone: Object.values((this.CustomerForm.get('PhoneNumber')?.value)).toString().replace(',', '')
+    });
+  }
+
+  isFormValid() {
+    let toReturn = true;
+    if (this.CustomerForm.invalid) {
+      this.CustomerForm.markAllAsTouched();
+      toReturn = false;
+    }
+    
+    if (this.CustomerForm.get('PhoneNumber')?.value != null && Object.keys(this.CustomerForm.get('PhoneNumber')?.value).length == 0) {
+      this.errorsSubject$.next('required');
+      toReturn = false;
+    }
+
+    return toReturn;
   }
 
   getSelectedCustomerType() {
