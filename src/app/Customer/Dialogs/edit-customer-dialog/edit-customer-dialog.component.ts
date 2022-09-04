@@ -52,7 +52,6 @@ export class EditCustomerDialogComponent implements OnInit {
     this.EditForm.controls['FirstName'].setValue(this.data.firstName);
     this.EditForm.controls['LastName'].setValue(this.data.lastName);
     this.EditForm.controls['TypeControl'].setValue(this.CustomerTypes[this.data.type - 1]);
-    const phoneNumber = { prefix: this.data.phone.slice() }
     this.EditForm.controls['PhoneNumber'].setValue(this.splitPhoneNumber(this.data.phone));
   }
 
@@ -63,20 +62,20 @@ export class EditCustomerDialogComponent implements OnInit {
   }
 
   subscribeToPhoneNumberStatusChanges() {
-    this.EditForm.get('PhoneNumber')?.statusChanges.subscribe(status => {
-      if (status == 'INVALID') {
-        if (this.EditForm.get('PhoneNumber')?.hasError('required')) {
-          this.errorsSubject$.next('Number is required.');
-        }
+    // this.EditForm.get('PhoneNumber')?.statusChanges.subscribe(status => {
+    //   if (status == 'INVALID') {
+    //     if (this.EditForm.get('PhoneNumber')?.hasError('required')) {
+    //       this.errorsSubject$.next('Number is required.');
+    //     }
 
-        if (this.EditForm.get('PhoneNumber')?.hasError('phoneNumberAlreadyExists')) {
-          this.errorsSubject$.next('Phone number already exists');
-        }
-      }
-      else {
-        this.errorsSubject$.next('');
-      }
-    })
+    //     if (this.EditForm.get('PhoneNumber')?.hasError('phoneNumberAlreadyExists')) {
+    //       this.errorsSubject$.next('Phone number already exists');
+    //     }
+    //   }
+    //   else {
+    //     this.errorsSubject$.next('');
+    //   }
+    // })
   }
 
   UpdateClick() {

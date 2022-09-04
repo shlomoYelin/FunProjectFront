@@ -18,7 +18,7 @@ export class CreateCustomerDialogComponent implements OnInit {
     FirstName: new FormControl('', { validators: Validators.required, updateOn: 'change' }),
     LastName: new FormControl('', { validators: Validators.required, updateOn: 'change' }),
     TypeControl: new FormControl('', { validators: Validators.required, updateOn: 'change' }),
-    PhoneNumber: new FormControl({}, [Validators.required], PhoneValidator.IsExists(this.PhoneNumberService))
+    PhoneNumber: new FormControl('', [Validators.required], PhoneValidator.IsExists(this.PhoneNumberService))
   });
 
   CustomerTypes = Object.keys(CustomerType).filter((item) => {
@@ -97,6 +97,8 @@ export class CreateCustomerDialogComponent implements OnInit {
   isFormValid() {
     let toReturn = true;
     if (this.CustomerForm.invalid) {
+      console.log(this.CustomerForm.value);
+      
       this.CustomerForm.markAllAsTouched();
       toReturn = false;
     }
