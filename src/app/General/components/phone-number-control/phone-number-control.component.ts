@@ -74,7 +74,7 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
 
   }
 
- 
+
 
   // validate(control: AbstractControl): ValidationErrors | null {
   //   console.log('validate');
@@ -91,12 +91,48 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
     this.subscribeToPhoneNumberForm();
     this.subscribeToParentErrorInput();
     this.setPrefixValidatorRequired();
+    this.subscribeToControlStatusChanges();
   }
 
   setPrefixValidatorRequired() {
     if (this.controlContainer.control?.get(this.formControlName)?.validator?.({} as AbstractControl)?.['required']) {
       this.phoneNumberForm.get('prefix')?.addValidators(Validators.required);
     }
+  }
+
+  subscribeToControlStatusChanges() {
+    // this.CustomerForm.get('PhoneNumber')?.statusChanges.subscribe(status => {
+    //   if (status == 'INVALID') {
+    //     if (this.CustomerForm.get('PhoneNumber')?.hasError('required')) {
+    //       this.errorsSubject$.next('Number is required.');
+    //     }
+
+    //     if (this.CustomerForm.get('PhoneNumber')?.hasError('phoneNumberAlreadyExists')) {
+    //       this.errorsSubject$.next('Phone number already exists');
+    //     }
+    //   }
+    //   else {
+    //     this.errorsSubject$.next('');
+    //   }
+    // });
+
+    const tmpValidator = (_: any) => { return { 'aaa': false } };
+
+    this.controlContainer.control?.statusChanges?.subscribe(status => {
+      console.log(status);
+      if (status == 'INVALID') {
+        this.phoneNumberForm.get('prefix')?.markAsTouched();
+        // if ((!this.phoneNumberForm.get('number')?.disabled) && this.phoneNumberForm.get('number')?.valid) {
+        this.phoneNumberForm.get('number')?.addValidators(tmpValidator);
+        // this.parentErrorMessage = errorMessage;
+        // this.phoneNumberForm.get('number')?.markAllAsTouched();??????
+        this.phoneNumberForm.get('number')?.updateValueAndValidity();
+        // }
+      }
+      else {
+        this.phoneNumberForm.get('number')?.removeValidators(tmpValidator);
+      }
+    });
   }
 
   writeValue(obj: any): void {
@@ -115,7 +151,7 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
   subscribeToParentErrorInput() {
     const tmpValidator = (_: any) => { return { 'aaa': false } };
     this.parentErrorsSubjectInput$.subscribe(errorMessage => {
-      
+
       if (errorMessage) {
         this.phoneNumberForm.get('prefix')?.markAsTouched();
         if ((!this.phoneNumberForm.get('number')?.disabled) && this.phoneNumberForm.get('number')?.valid) {

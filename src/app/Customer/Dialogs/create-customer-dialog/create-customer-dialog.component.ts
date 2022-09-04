@@ -40,20 +40,20 @@ export class CreateCustomerDialogComponent implements OnInit {
   }
 
   subscribeToPhoneNumberStatusChanges() {
-    this.CustomerForm.get('PhoneNumber')?.statusChanges.subscribe(status => {
-      if (status == 'INVALID') {
-        if (this.CustomerForm.get('PhoneNumber')?.hasError('required')) {
-          this.errorsSubject$.next('Number is required.');
-        }
+    // this.CustomerForm.get('PhoneNumber')?.statusChanges.subscribe(status => {
+    //   if (status == 'INVALID') {
+    //     if (this.CustomerForm.get('PhoneNumber')?.hasError('required')) {
+    //       this.errorsSubject$.next('Number is required.');
+    //     }
 
-        if (this.CustomerForm.get('PhoneNumber')?.hasError('phoneNumberAlreadyExists')) {
-          this.errorsSubject$.next('Phone number already exists');
-        }
-      }
-      else {
-        this.errorsSubject$.next('');
-      }
-    });
+    //     if (this.CustomerForm.get('PhoneNumber')?.hasError('phoneNumberAlreadyExists')) {
+    //       this.errorsSubject$.next('Phone number already exists');
+    //     }
+    //   }
+    //   else {
+    //     this.errorsSubject$.next('');
+    //   }
+    // });
 
   }
 
