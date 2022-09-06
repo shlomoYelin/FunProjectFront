@@ -37,10 +37,6 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
   });
 
   @Input() phoneCategory!: PhoneCategory;
-  @Input() parentErrorsSubjectInput$!: Subject<string>;
-
-  // @ViewChild('ngContentMatError') ngContentMatError!: ElementRef;
-  // @ContentChild('contentParagraph', { static: true }) ngContentMatError!: ElementRef;
 
   parentErrorMessage = '';
 
@@ -92,11 +88,9 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
   ngOnInit(): void {
     this.getPhoneNumberTypes();
     this.phoneNumberForm.get('number')?.disable();
-    // this.phoneNumberForm.get('number')?.
     this.enableNumberControlOnPrefixValid();
     this.clearNumberControlToolTipMessageOnPrefixValid();
     this.subscribeToPhoneNumberFormValueChange();
-    // this.subscribeToParentErrorInput();
     this.setPrefixValidatorRequired();
     this.subscribeToControlStatusChanges();
     this.markNumberAsTouchedOnUpdatePerfix();
@@ -113,73 +107,22 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
   setPrefixValidatorRequired() {
     if (this.controlContainer.control?.get(this.formControlName)?.validator?.({} as AbstractControl)?.['required']) {
       this.phoneNumberForm.get('prefix')?.addValidators(Validators.required);
-      // this.phoneNumberForm.get('number')?.addValidators(Validators.required);
-      // const tmpValidator = (_: any) => { return { 'aaa': false } };
-      // this.phoneNumberForm.get('number')?.addValidators(tmpValidator);
-
-
     }
-
-    // this.phoneNumberForm.addValidators(this.controlContainer.control?.get(this.formControlName)?.validator ?? []);
-    // if (this.controlContainer.control?.get(this.formControlName)?.validator != null) {
-
-    //   console.log(this.controlContainer.control?.get(this.formControlName)?.validator?.toString());
-    // }
-
   }
 
   subscribeToControlStatusChanges() {
-    // this.CustomerForm.get('PhoneNumber')?.statusChanges.subscribe(status => {
-    //   if (status == 'INVALID') {
-    //     if (this.CustomerForm.get('PhoneNumber')?.hasError('required')) {
-    //       this.errorsSubject$.next('Number is required.');
-    //     }
-
-    //     if (this.CustomerForm.get('PhoneNumber')?.hasError('phoneNumberAlreadyExists')) {
-    //       this.errorsSubject$.next('Phone number already exists');
-    //     }
-    //   }
-    //   else {
-    //     this.errorsSubject$.next('');
-    //   }
-    // });
-
     const tmpValidator = (_: any) => { return { 'aaa': false } };
 
     this.controlContainer.control?.get(this.formControlName)?.statusChanges?.subscribe(status => {
-      // console.log(status, this.ngContentMatError?.nativeElement?.children?.length);
-      // if (status == 'INVALID' && this.ngContentMatError.nativeElement.children.length == 0) {
-      //   this.controlContainer.control?.get(this.formControlName)?
-      // }
-      // console.log(this.controlContainer.control?.get(this.formControlName));
-      // setTimeout(() => {
-      // this.ngContentMatError.nativeElement.
-      // console.log(status, this.ngContentMatError.nativeElement);
-
-      // if (status == 'INVALID' && this.ngContentMatError.nativeElement.children.length > 0) {
-      console.log(status);
-
       if (status == 'INVALID') {
-        console.log('addValidators');
-
-        this.phoneNumberForm.get('prefix')?.markAsTouched();
-        // if ((!this.phoneNumberForm.get('number')?.disabled) && this.phoneNumberForm.get('number')?.valid) {
-        // if (this.phoneNumberForm.get('number')?.touched) {
-          this.phoneNumberForm.get('number')?.addValidators(tmpValidator);
-          // this.phoneNumberForm?.addValidators(tmpValidator);
-          // this.parentErrorMessage = errorMessage;
-          // this.phoneNumberForm.get('number')?.markAllAsTouched();??????
-          this.phoneNumberForm.get('number')?.updateValueAndValidity();
-        // }
-        // }
+        // this.phoneNumberForm.get('prefix')?.markAsTouched();
+        this.phoneNumberForm.get('number')?.addValidators(tmpValidator);
+        this.phoneNumberForm.get('number')?.updateValueAndValidity();
       }
       else {
-        console.log('removeValidators');
-
         this.phoneNumberForm.get('number')?.removeValidators(tmpValidator);
+        this.phoneNumberForm.get('number')?.updateValueAndValidity();
       }
-      // }, 1);
-
     });
   }
 
@@ -196,26 +139,6 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
     this.onTouched = fn;
   }
 
-  // subscribeToParentErrorInput() {
-  //   const tmpValidator = (_: any) => { return { 'aaa': false } };
-  //   this.parentErrorsSubjectInput$.subscribe(errorMessage => {
-
-  //     if (errorMessage) {
-  //       this.phoneNumberForm.get('prefix')?.markAsTouched();
-  //       if ((!this.phoneNumberForm.get('number')?.disabled) && this.phoneNumberForm.get('number')?.valid) {
-  //         this.phoneNumberForm.get('number')?.addValidators(tmpValidator);
-  //         this.parentErrorMessage = errorMessage;
-  //         this.phoneNumberForm.get('number')?.markAllAsTouched();
-  //         this.phoneNumberForm.get('number')?.updateValueAndValidity();
-  //       }
-  //     }
-  //     else {
-  //       this.phoneNumberForm.get('number')?.removeValidators(tmpValidator);
-  //       this.parentErrorMessage = errorMessage;
-  //     }
-  //   });
-  // }
-
   numberControlBlur() {
     const val = this.phoneNumberForm.get('number')?.value;
     if (!val) {
@@ -230,22 +153,19 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
         return JSON.stringify(prev) == JSON.stringify(current);
       }))
       .subscribe(val => {
-
         if (val.prefix && val.number) {
-          // this.phoneNumberForm.markAllAsTouched(); 
-
           this.onChange(val);
         }
         // else if (this.phoneNumberForm.dirty) {
         else if (this.phoneNumberForm.get('number')?.dirty) {
           console.log('this.onChange(null);');
-          
+
           this.onChange(null);
         }
       });
   }
 
-  markNumberAsTouchedOnUpdatePerfix() {//!!!
+  markNumberAsTouchedOnUpdatePerfix() {
     this.phoneNumberForm.get('prefix')?.valueChanges.subscribe(_ => {
       if (this.phoneNumberForm.get('number')?.value.length == 7) {
         this.phoneNumberForm.markAllAsTouched();

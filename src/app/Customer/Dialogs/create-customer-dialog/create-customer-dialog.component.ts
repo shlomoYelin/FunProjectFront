@@ -27,8 +27,6 @@ export class CreateCustomerDialogComponent implements OnInit {
 
   ServerErrorMessage!: string;
 
-  errorsSubject$ = new Subject<string>();
-
   constructor(
     private CreateCustomerDialogRef: MatDialogRef<CreateCustomerDialogComponent>,
     private CustomerService: CustomersService,
@@ -36,25 +34,6 @@ export class CreateCustomerDialogComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.subscribeToPhoneNumberStatusChanges();
-  }
-
-  subscribeToPhoneNumberStatusChanges() {
-    // this.CustomerForm.get('PhoneNumber')?.statusChanges.subscribe(status => {
-    //   if (status == 'INVALID') {
-    //     if (this.CustomerForm.get('PhoneNumber')?.hasError('required')) {
-    //       this.errorsSubject$.next('Number is required.');
-    //     }
-
-    //     if (this.CustomerForm.get('PhoneNumber')?.hasError('phoneNumberAlreadyExists')) {
-    //       this.errorsSubject$.next('Phone number already exists');
-    //     }
-    //   }
-    //   else {
-    //     this.errorsSubject$.next('');
-    //   }
-    // });
-
   }
 
   CancelClick() {
@@ -62,10 +41,6 @@ export class CreateCustomerDialogComponent implements OnInit {
   }
 
   CreateCustomerClick() {
-    // if (!this.isFormValid()) {
-    //   return;
-    // }
-
     if (this.CustomerForm.invalid) {
       this.CustomerForm.markAllAsTouched();
       return;
@@ -97,23 +72,6 @@ export class CreateCustomerDialogComponent implements OnInit {
       type: CustomerType[this.getSelectedCustomerType()],
       phone: Object.values((this.CustomerForm.get('PhoneNumber')?.value)).toString().replace(',', '')
     });
-  }
-
-  isFormValid() {
-    let toReturn = true;
-    if (this.CustomerForm.invalid) {
-      console.log(this.CustomerForm.value);
-      
-      this.CustomerForm.markAllAsTouched();
-      toReturn = false;
-    }
-    
-    if (this.CustomerForm.get('PhoneNumber')?.value != null && Object.keys(this.CustomerForm.get('PhoneNumber')?.value).length == 0) {
-      this.errorsSubject$.next('required');
-      toReturn = false;
-    }
-
-    return toReturn;
   }
 
   getSelectedCustomerType() {

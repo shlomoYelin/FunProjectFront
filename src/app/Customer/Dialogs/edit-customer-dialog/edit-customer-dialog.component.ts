@@ -30,10 +30,7 @@ export class EditCustomerDialogComponent implements OnInit {
   });
   CustomerType = CustomerType;
 
-
   ServerErrorMessage!: string;
-
-  errorsSubject$ = new Subject<string>();
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: Customer,
@@ -45,7 +42,6 @@ export class EditCustomerDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.fillPrevCustomerDetails();
-    this.subscribeToPhoneNumberStatusChanges();
   }
 
   fillPrevCustomerDetails() {
@@ -61,27 +57,7 @@ export class EditCustomerDialogComponent implements OnInit {
     return { prefix: prefix, number: number }
   }
 
-  subscribeToPhoneNumberStatusChanges() {
-    // this.EditForm.get('PhoneNumber')?.statusChanges.subscribe(status => {
-    //   if (status == 'INVALID') {
-    //     if (this.EditForm.get('PhoneNumber')?.hasError('required')) {
-    //       this.errorsSubject$.next('Number is required.');
-    //     }
-
-    //     if (this.EditForm.get('PhoneNumber')?.hasError('phoneNumberAlreadyExists')) {
-    //       this.errorsSubject$.next('Phone number already exists');
-    //     }
-    //   }
-    //   else {
-    //     this.errorsSubject$.next('');
-    //   }
-    // })
-  }
-
   UpdateClick() {
-    // if (!this.isFormValid()) {
-    //   return;
-    // }
 
     if (this.EditForm.invalid) {
       this.EditForm.markAllAsTouched();
@@ -113,21 +89,6 @@ export class EditCustomerDialogComponent implements OnInit {
       type: CustomerType[this.getSelectedCustomerType()],
       phone: Object.values((this.EditForm.get('PhoneNumber')?.value)).toString().replace(',', '')
     })
-  }
-
-  isFormValid() {
-    let toReturn = true;
-    if (this.EditForm.invalid) {
-      this.EditForm.markAllAsTouched();
-      toReturn = false;
-    }
-
-    if (this.EditForm.get('PhoneNumber')?.value != null && Object.keys(this.EditForm.get('PhoneNumber')?.value).length == 0) {
-      this.errorsSubject$.next('required');
-      toReturn = false;
-    }
-
-    return toReturn;
   }
 
   CancelClick() {

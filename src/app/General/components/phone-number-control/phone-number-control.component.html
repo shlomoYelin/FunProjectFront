@@ -32,18 +32,9 @@
                     The number must contain 7 digits</mat-error>
             </ng-template>
 
-            <mat-error> <!-- #ngContentMatError -->
+            <mat-error>
                 <ng-content></ng-content>
             </mat-error>
-
         </mat-form-field>
-                <!-- <ng-content></ng-content> -->
-
-        <!-- custom control:{{phoneNumberForm.valid}} -->
-        errors:{{phoneNumberForm.get('number')?.errors | json}}
-        <!-- status:{{phoneNumberForm.get('number')?.status}}    -->
-        parent status:{{controlContainer.control?.get(this.formControlName)?.status}}
-        touched:{{phoneNumberForm.get('number')?.touched}}
-
     </form>
 </div>

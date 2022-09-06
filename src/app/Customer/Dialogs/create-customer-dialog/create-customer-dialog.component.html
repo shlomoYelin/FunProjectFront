@@ -38,11 +38,10 @@
             </mat-grid-tile>
 
             <mat-grid-tile>
-                <app-phone-number-control formControlName="PhoneNumber" [parentErrorsSubjectInput$]="errorsSubject$">
+                <app-phone-number-control formControlName="PhoneNumber">
                    <samp *ngIf="CustomerForm.get('PhoneNumber')?.hasError('required')">required</samp>
                    <samp *ngIf="CustomerForm.get('PhoneNumber')?.hasError('phoneNumberAlreadyExists')">Phone number already exists</samp>
                 </app-phone-number-control>
-                <!-- create form:{{CustomerForm.get('PhoneNumber')?.valid}} -->
             </mat-grid-tile>
         </mat-grid-list>
 
