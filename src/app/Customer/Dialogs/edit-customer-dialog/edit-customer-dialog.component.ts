@@ -79,7 +79,12 @@ export class EditCustomerDialogComponent implements OnInit {
   }
 
   UpdateClick() {
-    if (!this.isFormValid()) {
+    // if (!this.isFormValid()) {
+    //   return;
+    // }
+
+    if (this.EditForm.invalid) {
+      this.EditForm.markAllAsTouched();
       return;
     }
 

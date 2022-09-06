@@ -62,7 +62,12 @@ export class CreateCustomerDialogComponent implements OnInit {
   }
 
   CreateCustomerClick() {
-    if (!this.isFormValid()) {
+    // if (!this.isFormValid()) {
+    //   return;
+    // }
+
+    if (this.CustomerForm.invalid) {
+      this.CustomerForm.markAllAsTouched();
       return;
     }
 

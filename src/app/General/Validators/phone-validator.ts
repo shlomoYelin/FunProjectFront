@@ -8,7 +8,7 @@ export class PhoneValidator {
         return (control: AbstractControl): Observable<ValidationErrors> => {
             // console.log(control.value.number);
             
-            if (!control.value.number || control.value.number?.length < 7 || prevPhoneNumber == (control.value.prefix + control.value.number)) {
+            if (control.invalid || !control.value.number || control.value.number?.length < 7 || prevPhoneNumber == (control.value.prefix + control.value.number)) {
                 return of(null as unknown as ValidationErrors);                
             }
 

@@ -1,6 +1,6 @@
-import { AfterViewInit, Component, ContentChild, DoCheck, ElementRef, forwardRef, Injector, Input, OnInit, Optional, Self, ViewChild } from '@angular/core';
-import { AbstractControl, ControlContainer, ControlValueAccessor, FormControl, FormControlStatus, FormGroup, NgControl, NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
-import { distinctUntilChanged, retry, Subject, timeout } from 'rxjs';
+import { Component, DoCheck, ElementRef, forwardRef, Input, OnInit, ViewChild } from '@angular/core';
+import { AbstractControl, ControlContainer, ControlValueAccessor, FormControl, FormControlStatus, FormGroup, NG_VALUE_ACCESSOR, ValidatorFn, Validators } from '@angular/forms';
+import { distinctUntilChanged, Subject } from 'rxjs';
 import { PhoneCategory } from '../../Enums/phone-category';
 import { PhoneNumber } from '../../Models/phone-number';
 import { PhoneNumberType } from '../../Models/phone-number-type';
@@ -39,7 +39,7 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
   @Input() phoneCategory!: PhoneCategory;
   @Input() parentErrorsSubjectInput$!: Subject<string>;
 
-  @ViewChild('ngContentMatError') ngContentMatError!: ElementRef;
+  // @ViewChild('ngContentMatError') ngContentMatError!: ElementRef;
   // @ContentChild('contentParagraph', { static: true }) ngContentMatError!: ElementRef;
 
   parentErrorMessage = '';
@@ -72,14 +72,12 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
   constructor(
     public phoneNumberService: PhoneNumberService,
     // private inj: Injector,
-    private controlContainer: ControlContainer
+    public controlContainer: ControlContainer
   ) {
 
   }
   ngDoCheck(): void {
-    if (this.controlContainer.control?.get(this.formControlName)?.touched) {
-      this.phoneNumberForm.markAllAsTouched();
-    }
+    this.markAllAsTouchedOnParentMarkAsTouched();
   }
 
 
@@ -94,18 +92,40 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
   ngOnInit(): void {
     this.getPhoneNumberTypes();
     this.phoneNumberForm.get('number')?.disable();
+    // this.phoneNumberForm.get('number')?.
     this.enableNumberControlOnPrefixValid();
     this.clearNumberControlToolTipMessageOnPrefixValid();
-    this.subscribeToPhoneNumberForm();
+    this.subscribeToPhoneNumberFormValueChange();
     // this.subscribeToParentErrorInput();
     this.setPrefixValidatorRequired();
     this.subscribeToControlStatusChanges();
+    this.markNumberAsTouchedOnUpdatePerfix();
+  }
+
+  markAllAsTouchedOnParentMarkAsTouched() {
+    if (this.controlContainer.control?.get(this.formControlName)?.touched) {
+      console.log('none blabla');
+
+      this.phoneNumberForm.markAllAsTouched();
+    }
   }
 
   setPrefixValidatorRequired() {
     if (this.controlContainer.control?.get(this.formControlName)?.validator?.({} as AbstractControl)?.['required']) {
       this.phoneNumberForm.get('prefix')?.addValidators(Validators.required);
+      // this.phoneNumberForm.get('number')?.addValidators(Validators.required);
+      // const tmpValidator = (_: any) => { return { 'aaa': false } };
+      // this.phoneNumberForm.get('number')?.addValidators(tmpValidator);
+
+
     }
+
+    // this.phoneNumberForm.addValidators(this.controlContainer.control?.get(this.formControlName)?.validator ?? []);
+    // if (this.controlContainer.control?.get(this.formControlName)?.validator != null) {
+
+    //   console.log(this.controlContainer.control?.get(this.formControlName)?.validator?.toString());
+    // }
+
   }
 
   subscribeToControlStatusChanges() {
@@ -134,25 +154,32 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
       // console.log(this.controlContainer.control?.get(this.formControlName));
       // setTimeout(() => {
       // this.ngContentMatError.nativeElement.
-        // console.log(status, this.ngContentMatError.nativeElement);
+      // console.log(status, this.ngContentMatError.nativeElement);
 
-        // if (status == 'INVALID' && this.ngContentMatError.nativeElement.children.length > 0) {
-          if (status == 'INVALID' ) {
-          console.log(status);
+      // if (status == 'INVALID' && this.ngContentMatError.nativeElement.children.length > 0) {
+      console.log(status);
 
-          this.phoneNumberForm.get('prefix')?.markAsTouched();
-          // if ((!this.phoneNumberForm.get('number')?.disabled) && this.phoneNumberForm.get('number')?.valid) {
+      if (status == 'INVALID') {
+        console.log('addValidators');
+
+        this.phoneNumberForm.get('prefix')?.markAsTouched();
+        // if ((!this.phoneNumberForm.get('number')?.disabled) && this.phoneNumberForm.get('number')?.valid) {
+        // if (this.phoneNumberForm.get('number')?.touched) {
           this.phoneNumberForm.get('number')?.addValidators(tmpValidator);
+          // this.phoneNumberForm?.addValidators(tmpValidator);
           // this.parentErrorMessage = errorMessage;
           // this.phoneNumberForm.get('number')?.markAllAsTouched();??????
           this.phoneNumberForm.get('number')?.updateValueAndValidity();
-          // }
-        }
-        else {
-          this.phoneNumberForm.get('number')?.removeValidators(tmpValidator);
-        }
+        // }
+        // }
+      }
+      else {
+        console.log('removeValidators');
+
+        this.phoneNumberForm.get('number')?.removeValidators(tmpValidator);
+      }
       // }, 1);
-     
+
     });
   }
 
@@ -196,20 +223,34 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
     }
   }
 
-  subscribeToPhoneNumberForm() {
+  subscribeToPhoneNumberFormValueChange() {
     this.phoneNumberForm
       .valueChanges
       .pipe(distinctUntilChanged((prev: PhoneNumber, current: PhoneNumber) => {
         return JSON.stringify(prev) == JSON.stringify(current);
       }))
       .subscribe(val => {
+
         if (val.prefix && val.number) {
+          // this.phoneNumberForm.markAllAsTouched(); 
+
           this.onChange(val);
         }
-        else if (this.phoneNumberForm.dirty) {
+        // else if (this.phoneNumberForm.dirty) {
+        else if (this.phoneNumberForm.get('number')?.dirty) {
+          console.log('this.onChange(null);');
+          
           this.onChange(null);
         }
       });
+  }
+
+  markNumberAsTouchedOnUpdatePerfix() {//!!!
+    this.phoneNumberForm.get('prefix')?.valueChanges.subscribe(_ => {
+      if (this.phoneNumberForm.get('number')?.value.length == 7) {
+        this.phoneNumberForm.markAllAsTouched();
+      }
+    });
   }
 
   getPhoneNumberTypes() {
