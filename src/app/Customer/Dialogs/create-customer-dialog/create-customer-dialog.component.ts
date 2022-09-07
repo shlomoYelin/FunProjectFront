@@ -64,6 +64,20 @@ export class CreateCustomerDialogComponent implements OnInit {
       );
   }
 
+  isFormValid() {
+    let toReturn = true;
+    if (this.CustomerForm.invalid) {
+      this.CustomerForm.markAllAsTouched();
+      toReturn = false;
+    }
+
+    if (this.CustomerForm.get('PhoneNumber')?.value != null && Object.keys(this.CustomerForm.get('PhoneNumber')?.value).length == 0) {
+      toReturn = false;
+    }
+
+    return toReturn;
+  }
+
   createCustomer() {
     return this.CustomerService.create({
       id: 0,

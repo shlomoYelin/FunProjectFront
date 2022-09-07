@@ -58,7 +58,6 @@ export class EditCustomerDialogComponent implements OnInit {
   }
 
   UpdateClick() {
-
     if (this.EditForm.invalid) {
       this.EditForm.markAllAsTouched();
       return;
@@ -79,6 +78,20 @@ export class EditCustomerDialogComponent implements OnInit {
           error: (error: any) => this.ServerErrorMessage = 'Action failed please try again'
         }
       )
+  }
+
+  isFormValid() {
+    let toReturn = true;
+    if (this.EditForm.invalid) {
+      this.EditForm.markAllAsTouched();
+      toReturn = false;
+    }
+
+    if (this.EditForm.get('PhoneNumber')?.value != null && Object.keys(this.EditForm.get('PhoneNumber')?.value).length == 0) {
+      toReturn = false;
+    }
+
+    return toReturn;
   }
 
   updateCustomer() {

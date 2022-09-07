@@ -21,8 +21,6 @@
 
             <mat-icon matSuffix>phone</mat-icon>
 
-            <mat-error *ngIf="parentErrorMessage">{{parentErrorMessage}}</mat-error>
-
             <mat-error *ngIf="phoneNumberForm.get('number')?.hasError('pattern'); else lenError;">Please enter
                 valid phone number
             </mat-error>
