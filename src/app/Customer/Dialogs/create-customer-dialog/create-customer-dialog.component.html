@@ -39,8 +39,13 @@
 
             <mat-grid-tile>
                 <app-phone-number-control formControlName="PhoneNumber">
-                   <span *ngIf="CustomerForm.get('PhoneNumber')?.hasError('required')">required</span>
-                   <span *ngIf="CustomerForm.get('PhoneNumber')?.hasError('phoneNumberAlreadyExists')">Phone number already exists</span>
+                    <span error-message>
+                        <span *ngIf="CustomerForm.get('PhoneNumber')?.hasError('required')">required</span>
+                        <span *ngIf="CustomerForm.get('PhoneNumber')?.hasError('phoneNumberAlreadyExists')">
+                            Phone number already exists
+                        </span>
+                    </span>
+
                 </app-phone-number-control>
             </mat-grid-tile>
         </mat-grid-list>

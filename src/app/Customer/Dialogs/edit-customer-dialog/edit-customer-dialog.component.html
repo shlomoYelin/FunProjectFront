@@ -35,11 +35,16 @@
                     </mat-error>
                 </mat-form-field>
             </mat-grid-tile>
-            
+
             <mat-grid-tile>
                 <app-phone-number-control formControlName="PhoneNumber">
-                    <samp *ngIf="EditForm.get('PhoneNumber')?.hasError('required')">required</samp>
-                    <samp *ngIf="EditForm.get('PhoneNumber')?.hasError('phoneNumberAlreadyExists')">Phone number already exists</samp>
+                    <span error-message>
+                        <samp *ngIf="EditForm.get('PhoneNumber')?.hasError('required')">required</samp>
+                        <samp *ngIf="EditForm.get('PhoneNumber')?.hasError('phoneNumberAlreadyExists')">
+                            Phone number already exists
+                        </samp>
+                    </span>
+
                 </app-phone-number-control>
             </mat-grid-tile>
         </mat-grid-list>

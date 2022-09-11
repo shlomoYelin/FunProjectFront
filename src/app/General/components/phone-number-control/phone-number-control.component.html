@@ -21,18 +21,21 @@
 
             <mat-icon matSuffix>phone</mat-icon>
 
-            <mat-error *ngIf="phoneNumberForm.get('number')?.hasError('pattern'); else lenError;">Please enter
-                valid phone number
-            </mat-error>
-
-            <ng-template #lenError>
-                <mat-error *ngIf="phoneNumberForm.get('number')?.hasError('minlength')">
-                    The number must contain 7 digits</mat-error>
-            </ng-template>
-
             <mat-error>
-                <ng-content></ng-content>
+                <div *ngIf="phoneNumberForm.get('number')?.hasError('pattern'); else elseError;">Please enter
+                    valid phone number
+                </div>
+
+                <ng-template #elseError>
+                    <div *ngIf="phoneNumberForm.get('number')?.hasError('minlength')">
+                        The number must contain 7 digits</div>
+                </ng-template>
+
+                <div>
+                    <ng-content select="[error-message]"></ng-content>
+                </div>
             </mat-error>
+
         </mat-form-field>
     </form>
 </div>
