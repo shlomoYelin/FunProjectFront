@@ -45,38 +45,20 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
 
   readonly tmpValidator = (_: any) => { return { 'aaa': false } };
 
-  // ngControl!: NgControl
-
-  // control!: AbstractControl;
-
   @Input()
   formControlName!: string;
-
-  // constructor(
-  //   public phoneNumberService: PhoneNumberService,
-  //   @Optional() @Self() public ngControl: NgControl
-  // ) { 
-  //   if (this.ngControl) {
-  //     this.ngControl.valueAccessor = this;
-  //   }
-  // }
 
   constructor(
     public phoneNumberService: PhoneNumberService,
     // private inj: Injector,
     public controlContainer: ControlContainer,
     // @Optional() @Self() public ngControl: NgControl
-  ) {
-    // console.log('ngControl: ' + this.ngControl.name);
-    // console.log('controlContainer: ' + this.controlContainer.name);
-    
-      
+  ) { 
   }
+
   ngDoCheck(): void {
     this.markAllAsTouchedOnParentMarkAsTouched();
   }
-
-
 
   validate(control: AbstractControl): ValidationErrors | null {
     if (control.status == 'VALID') {
@@ -99,7 +81,6 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
   }
 
   markAllAsTouchedOnParentMarkAsTouched() {
-    // if (this.controlContainer.control?.get(this.formControlName)?.touched) {
       if (this.controlContainer.control?.touched) {
       this.phoneNumberForm.markAllAsTouched();
     }
@@ -107,7 +88,6 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
 
   setPrefixValidatorRequired() {
     if (this.controlContainer.control?.get(this.formControlName)?.validator?.({} as AbstractControl)?.['required']) {
-    // if (this.controlContainer.control?.validator?.({} as AbstractControl)?.['required']) {
       this.phoneNumberForm.get('prefix')?.addValidators(Validators.required);
     }
   }
@@ -116,7 +96,6 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
 
     this.controlContainer.control?.get(this.formControlName)?.statusChanges?.subscribe(status => {
       if (status == 'INVALID') {
-        // this.phoneNumberForm.get('prefix')?.markAsTouched();
         this.phoneNumberForm.get('number')?.addValidators(this.tmpValidator);
         this.phoneNumberForm.get('number')?.updateValueAndValidity();
       }
@@ -154,18 +133,9 @@ export class PhoneNumberControlComponent implements OnInit, ControlValueAccessor
         return JSON.stringify(prev) == JSON.stringify(current);
       }))
       .subscribe(val => {
-        // if (this.phoneNumberForm.invalid) {
-        //   console.log('invalid phone number');
-
-        //   this.onChange(null);
-
-        //   return;
-        // }
-
         if (val.prefix && val.number) {
           this.onChange(val);
         }
-        // else if (this.phoneNumberForm.dirty) {
         else if (this.phoneNumberForm.get('number')?.dirty) {
           this.onChange(null);
         }
