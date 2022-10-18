@@ -26,6 +26,7 @@ import { SignalrService } from './SignalR/signalr.service';
 import { PhoneNumberControlComponent } from './General/components/phone-number-control/phone-number-control.component';
 import { OnlyNumberDirective } from './General/Directives/only-number.directive';
 import { PhoneNumberPipe } from './General/Pipes/phone-number.pipe';
+import { OrdersStatisticsComponent } from './Order/components/orders-statistics/orders-statistics.component';
 
 
 @NgModule({
@@ -48,6 +49,7 @@ import { PhoneNumberPipe } from './General/Pipes/phone-number.pipe';
     PhoneNumberControlComponent,
     OnlyNumberDirective,
     PhoneNumberPipe,
+    OrdersStatisticsComponent,
   ],
   imports: [
     BrowserModule,
