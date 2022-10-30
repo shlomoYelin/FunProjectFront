@@ -2,10 +2,12 @@
 
   <div class="notifications" *ngIf="_signalrService.outeOfStockProducts.length">
     <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
-      <mat-icon [matBadge]="_signalrService.outeOfStockProducts.length" matBadgeColor="warn">notifications</mat-icon><!--info-->
+      <mat-icon [matBadge]="_signalrService.outeOfStockProducts.length" matBadgeColor="warn">notifications</mat-icon>
+      <!--info-->
     </button>
     <mat-menu #menu="matMenu">
-      <span mat-menu-item *ngFor="let product of _signalrService.outeOfStockProducts" [disabled]="true" class="notifications-item">
+      <span mat-menu-item *ngFor="let product of _signalrService.outeOfStockProducts" [disabled]="true"
+        class="notifications-item">
         <strong class="message">{{product.description}} is out of stock</strong>
       </span>
 
@@ -21,6 +23,7 @@
     <a mat-button routerLink="/customers" routerLinkActive="active">Customers</a>
     <a mat-button routerLink="/products" routerLinkActive="active">Products</a>
     <a mat-button routerLink="/orders" routerLinkActive="active">Orders</a>
+    <a mat-button routerLink="/orders-statistics" routerLinkActive="active">Orders statistics</a>
   </mat-nav-list>
 
 

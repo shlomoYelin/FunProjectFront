@@ -27,6 +27,7 @@ import { PhoneNumberControlComponent } from './General/components/phone-number-c
 import { OnlyNumberDirective } from './General/Directives/only-number.directive';
 import { PhoneNumberPipe } from './General/Pipes/phone-number.pipe';
 import { OrdersStatisticsComponent } from './Order/components/orders-statistics/orders-statistics.component';
+import { NgChartsModule } from 'ng2-charts';
 
 
 @NgModule({
@@ -58,6 +59,7 @@ import { OrdersStatisticsComponent } from './Order/components/orders-statistics/
     AppMaterialModule,
     HttpClientModule,
     ReactiveFormsModule,
+    NgChartsModule
   ],
   providers: [
     // { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }

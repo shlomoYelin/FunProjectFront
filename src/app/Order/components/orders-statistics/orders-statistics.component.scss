@@ -1,0 +1,18 @@
+@use '../../../General/styles/global-style.scss' as global;
+
+.content {
+    width: 60%;
+}
+
+.page-wrap {
+    @include global.flex-center-parent;
+}
+
+.year-btn {
+    @include global.flex-center-parent;
+}
+
+.year-formField{
+    text-align-last: center;
+    width: 13%;
+}

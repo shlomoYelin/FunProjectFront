@@ -1,1 +1,29 @@
-<p>orders-statistics works!</p>
+<div class="year-btn">
+    <mat-form-field appearance="outline" class="year-formField">
+        <!-- <mat-label>Outline form field</mat-label> -->
+        <input matInput placeholder="Placeholder" OnlyNumber [formControl]="yearControl">
+        <!-- <button><span matPrefix>$&nbsp;</span></button>  -->
+        <!-- <span matSuffix (click)="testClick()" >.00</span> -->
+        <!-- <span > -->
+        <button mat-button mat-icon-button matSuffix [disabled]="yearControl.value < 2" (click)="yearControlPromotion(-1)">
+            <mat-icon>keyboard_arrow_left</mat-icon>
+        </button>
+        <!-- </span> -->
+ 
+        <button mat-icon-button matSuffix (click)="yearControlPromotion(1)">
+            <mat-icon>keyboard_arrow_right</mat-icon>
+        </button>
+
+        <!-- <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
+        <mat-hint>Hint</mat-hint> -->
+    </mat-form-field>
+</div>
+
+<div class="page-wrap">
+
+    <div class="content">
+        <canvas baseChart [data]="lineChartData" [type]="'line'">
+
+        </canvas>
+    </div>
+</div>

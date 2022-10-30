@@ -4,6 +4,7 @@ import { map, Observable } from 'rxjs';
 import { ActionStatus } from 'src/app/General/Models/action-status';
 import { Order } from '../interfaces/order';
 import { OrderFiltersValuesModel } from '../Models/order-filters-values-model';
+import { TotalMonthlyOrders } from '../Models/total-monthly-orders';
 
 @Injectable({
   providedIn: 'root'
@@ -17,8 +18,16 @@ export class OrdersService {
     return this.http.get<Order>(`${this.BaseUrl}/GetOrder/${id}`);
   }
 
-  getByFilter(orderFilters: OrderFiltersValuesModel) {
-    return this.http.post<Order[]>(`${this.BaseUrl}/GetOrdersByFilters`, orderFilters);
+  create(order: Order) {
+    return this.http.post<ActionStatus>(`${this.BaseUrl}/CreateOrder`, order);
+  }
+
+  update(order: Order) {
+    return this.http.put<ActionStatus>(`${this.BaseUrl}/UpdateOrder`, order)
+  }
+
+  delete(id: number) {
+    return this.http.delete<ActionStatus>(`${this.BaseUrl}/DeleteOrder/${id}`);
   }
 
   getExcelReportByFilter(orderFilters: OrderFiltersValuesModel) {
@@ -30,16 +39,8 @@ export class OrdersService {
       });
   }
 
-  create(order: Order) {
-    return this.http.post<ActionStatus>(`${this.BaseUrl}/CreateOrder`, order);
-  }
-
-  update(order: Order) {
-    return this.http.put<ActionStatus>(`${this.BaseUrl}/UpdateOrder`, order)
-  }
-
-  delete(id: number) {
-    return this.http.delete<ActionStatus>(`${this.BaseUrl}/DeleteOrder/${id}`);
+  getByFilter(orderFilters: OrderFiltersValuesModel) {
+    return this.http.post<Order[]>(`${this.BaseUrl}/GetOrdersByFilters`, orderFilters);
   }
 
   getByFiltersWithFullName(orderFilters: OrderFiltersValuesModel): Observable<Order[]> {
@@ -62,5 +63,14 @@ export class OrdersService {
           }
         )
       )
+  }
+
+  getTotalMonthlyOrdersByYear(year: number) {
+    return this.http.get<TotalMonthlyOrders[]>(`${this.BaseUrl}/GetTotalMonthlyOrdersByYear/${year}`)
+      .pipe(
+        map(data => {
+          data.forEach(item => item.date = new Date(item.date));
+          return data;
+        }));
   }
 }
