@@ -72,7 +72,6 @@ export class TableFiltersComponent implements OnInit {
             return false;
           }
           return true;
-          new Blob
         }),
       )
       .subscribe({
@@ -127,8 +126,8 @@ export class TableFiltersComponent implements OnInit {
     this.subscribeToCustomerNameChange();
     this.subscribeTocustomerTypeChange();
 
-    this.filtersForm.valueChanges.subscribe(_ => this.getBtnText());
-    this.dateRange.valueChanges.subscribe(_ => this.getBtnText());
+    this.filtersForm.valueChanges.subscribe(_ => this.updateFilterBtnText());
+    this.dateRange.valueChanges.subscribe(_ => this.updateFilterBtnText());
   }
 
   updateFiltersValues() {
@@ -181,9 +180,14 @@ export class TableFiltersComponent implements OnInit {
     });
   }
 
-  getBtnText() {
-    this.btnfilterText = Object.values(this.filtersValues)
-      .some(v => v !== null && typeof v !== "undefined" && v !== '') ? 'Filter' : 'Get all orders';
+  updateFilterBtnText() {
+    this.btnfilterText = (Object.values(this.filtersValues)
+      .filter(v => typeof v !== "object")
+      .some(v => v !== null && typeof v !== "undefined" && v !== ''))
+
+      || (Object.values(this.filtersValues.dateRange ?? {})
+        .some(v => v !== null))
+      ? 'Filter' : 'Get all orders';
   }
 
   btnFilterClick() {
